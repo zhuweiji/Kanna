@@ -1,0 +1,35 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+
+{% block title %} <title>Lesson Analysis</title> {% endblock %}
+
+{% block content %}
+<!--{% if object_list %}-->
+
+<br>
+<br>
+<div class="container">
+    <h1> Choose a script to analyse</h1>
+    <br>
+    <h1 class="lead"> Your scripts:</h1>
+    <div class="container">
+        <br>
+        <ul>
+            {% for script in script_list %}
+                <li style="font-size: 1.25em;">
+                    <a href="{{ script.get_absolute_url }}">{{script.name}}</a>
+                    <p style="font-size: 0.75em;">{{script.text}}</p>
+                </li>
+
+            {% endfor %}
+        </ul>
+    </div>
+<!--    {% else %}-->
+<!--        <p> There are no scripts for this user.</p>-->
+<!--    {% endif %}-->
+
+</div>
+
+
+
+{% endblock %}

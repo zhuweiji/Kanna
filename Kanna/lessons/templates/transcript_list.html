@@ -1,0 +1,43 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+
+{% block title %} <title>Transcripts</title> {% endblock %}
+
+{% block content %}
+<!--{% if object_list %}-->
+
+<div class="jumbotron" style="color: #D9D9D9; background: #284B63">
+  <h1 class="display-4">Evaluate your lesson</h1>
+  <p class="lead">Select one of your transcripts to analyse, and then select a pre-prepared topic to grade against.</p>
+  <hr class="my-4">
+  <p>Your lessons are graded according to several criteria: which include</p>
+    <ul>
+        <li> Hitting of target keywords</li>
+        <li> Tone and excessive usage of fillers </li>
+        <li> tbd </li>
+    </ul>
+  <a class="btn btn-secondary btn-lg" href="#" role="button">Learn more</a>
+</div>
+
+<div class="container">
+    <p></p>
+    <h1 class="lead">Available transcripts:</h1>
+
+    <br>
+    <ul>
+        {% for transcript in transcript_list %}
+        <li>
+            <a href="{{ transcript.get_absolute_url }}">{{transcript.name}}</a>
+            <p>{{transcript.text}}</p>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+<!--    {% else %}-->
+<!--        <p> There are no scripts for this user.</p>-->
+<!--    {% endif %}-->
+
+
+
+
+{% endblock %}

@@ -11,27 +11,50 @@
     <!--    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>-->
     <link href="https://fonts.googleapis.com/css2?family=Abel&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/master.css' %}">
+    {% block head %}{% endblock %}
+    <style>
+        body {
+    background-color: black;
+    color: #E5E5E5;
+    font-family: 'Abel', sans-serif;
+    font-size: large;
+}
+    </style>
 </head>
-<body data-spy="scroll" data-target="#navbar">
+    <body data-spy="scroll" data-target="#navbar">
 
-<nav id="navbar" class="navbar sticky-top navbar-dark bg-dark">
-    <a class="navbar-brand" href="">Home</a>
-    <ul class="nav nav-pills">
-        <li class="nav-item active">
-            <a class="nav-link" href="{% url 'analysis' %}">Analysis</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href=""></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href=""></a>
-        </li>
-        <li>
-            <a class="nav-link" href=""></a>
-        </li>
-    </ul>
-</nav>
-{% block content %}
-{% endblock %}
-</body>
+        <nav id="navbar" class="navbar sticky-top navbar-dark bg-dark">
+            <a class="navbar-brand" href="{% url 'index' %}">Home</a>
+            <ul class="nav nav-pills">
+                <li class="nav-item active">
+                    <a class="nav-link" style="color: white;" href="{% url 'transcript_list' %}">Analysis</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" style="color: white;" href="{% url 'record' %}">Record</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" style="color: white;" href=""></a>
+                </li>
+                <li>
+                    <a class="nav-link" href=""></a>
+                </li>
+            </ul>
+        </nav>
+        {% block content %}
+        {% endblock %}
+
+        <div id="footer" style="
+        position: fixed;
+        bottom:0px;
+        left: 0;
+        right: 0;
+        height: 1.5em;
+        text-align: right;
+        background-color: #343a40;
+        color: white;
+        font-size: 0.75em;">
+        <p>user: {{user}}</p>
+        </div>
+
+    </body>
 </html>

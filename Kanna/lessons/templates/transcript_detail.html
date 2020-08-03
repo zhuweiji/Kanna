@@ -1,0 +1,22 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+
+{% block title %} <title>Lesson Analysis</title> {% endblock %}
+
+{% block content %}
+
+
+
+<br>
+<br>
+<br>
+<div class="container">
+    <h1 class="display-4">{{ transcript.name }}</h1>
+    <br>
+    <p>{{transcript.text}}</p>
+    <br>
+    <a href="{% url 'script_list' %}" class="btn btn-primary" onclick="transcript_detail.add_transcript_to_session">Analyse</a>
+</div>
+
+
+{% endblock %}
