@@ -27,7 +27,7 @@
     <ul>
         {% for transcript in transcript_list %}
         <li>
-            <a href="{{ transcript.get_absolute_url }}">{{transcript.name}}</a>
+            <a href="{{ transcript.get_absolute_url }}">{{transcript}}</a>
             <p>{{transcript.text}}</p>
         </li>
         {% endfor %}

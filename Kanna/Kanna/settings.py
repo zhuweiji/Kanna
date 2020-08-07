@@ -31,6 +31,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'lessons')
 ]
 
+AUTH_USER_MODEL = 'lessons.CustomUser'
 
 # Application definition
 
@@ -124,6 +125,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-LOGIN_REDIRECT_URL = '/lessons'
+LOGIN_REDIRECT_URL = '/lessons/'
 
-LOGIN_URL = 'accounts/login/'
+LOGIN_URL = '/accounts/login/'

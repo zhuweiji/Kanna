@@ -32,7 +32,7 @@ def index(request):
 #     return render(request,'script_list.html', context=context)
 
 
-class ScriptListView(generic.ListView):
+class ScriptListView(LoginRequiredMixin, generic.ListView):
     model = Script
     template_name = 'script_list.html'
     # paginate_by = 10
@@ -44,7 +44,7 @@ class ScriptListView(generic.ListView):
         return context
 
 
-class ScriptDetailView(generic.DetailView):
+class ScriptDetailView(LoginRequiredMixin, generic.DetailView):
     model = Script
     template_name = 'script_detail.html'
 
@@ -55,12 +55,12 @@ class ScriptDetailView(generic.DetailView):
         return context
 
 
-class TranscriptListView(generic.ListView):
+class TranscriptListView(LoginRequiredMixin, generic.ListView):
     model = Transcript
     template_name = 'transcript_list.html'
 
 
-class TranscriptDetailView(generic.DetailView):
+class TranscriptDetailView(LoginRequiredMixin, generic.DetailView):
     model = Transcript
     template_name = 'transcript_detail.html'
 
@@ -83,6 +83,7 @@ class SelectTranscriptView(generic.detail.SingleObjectMixin, View):
 #     return render(request, 'index.html', context=context)
 
 
+@login_required
 def analysis(request):
     context = {
 
@@ -90,6 +91,7 @@ def analysis(request):
     return render(request, 'analysis.html', context=context)
 
 
+@login_required
 def record(request):
     context = {
 
