@@ -1,8 +1,7 @@
 from django.contrib import admin
-from .models import Script, ScriptKeywords, Transcript
+from .models import *
 
 # Register your models here.
 
-admin.site.register(ScriptKeywords)
 admin.site.register(Script)
 admin.site.register(Transcript)

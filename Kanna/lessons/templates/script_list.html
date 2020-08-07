@@ -9,6 +9,11 @@
 <br>
 <br>
 <div class="container">
+    {% if put_session_object %}
+    {{put_session_object}}
+    {% else %}
+    <p> transcript missing</p>
+    {% endif %}
     <h1> Choose a script to analyse</h1>
     <br>
     <h1 class="lead"> Your scripts:</h1>

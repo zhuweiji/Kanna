@@ -1,10 +1,18 @@
-from django.shortcuts import render
-from django.views import generic
+from django.shortcuts import render, redirect
+from django.views import generic, View
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.views.generic import TemplateView
 from .models import *
 
 # Create your views here.
 
 
+# class LoginRequiredView(LoginRequiredMixin, View):
+#     login_url = 'accounts/login/'
+#     redirect_field_name = 'lessons'
+
+@login_required
 def index(request):
     user = None
     if request.user.is_authenticated:
@@ -35,10 +43,6 @@ class ScriptListView(generic.ListView):
         context['user'] = user
         return context
 
-    def update_selected_script(self, script):
-        self.request.session['script'] = script
-        print(self.request.session['script'])
-
 
 class ScriptDetailView(generic.DetailView):
     model = Script
@@ -61,8 +65,18 @@ class TranscriptDetailView(generic.DetailView):
     template_name = 'transcript_detail.html'
 
     def add_transcript_to_session(self):
-        self.request.session['transcript'] = self.request.transcript
-        print(self.request.session)
+        pass
+
+
+class SelectTranscriptView(generic.detail.SingleObjectMixin, View):
+    model = Transcript
+
+    def post(self, request, *args, **kwargs):
+        myobj = self.get_object()
+        request.session['selected_transcript'] = myobj.id
+        return redirect(...)
+
+
 # def analysis(request):
 #     context = {
 #     }
