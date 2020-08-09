@@ -1,0 +1,21 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+
+{% block title %} <title></title> {% endblock %}
+
+{% block content %}
+
+<br>
+<br>
+<br>
+<div class="container">
+    <h2> {{ instance.transcript }}</h2>
+    <h2> {{ instance.transcript.text }}</h2>
+    <h2> {{ instance.script }}</h2>
+    <h2> {{ instance.user }}</h2>
+    <h2> {{ instance.date }}</h2>
+    <h2> {{ instance.score }}</h2>
+</div>
+
+
+{% endblock %}

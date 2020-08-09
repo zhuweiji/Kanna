@@ -1,0 +1,87 @@
+{% extends 'base_generic.html' %}
+{% block head %}
+    <style>
+        #text-editor{
+            margin: 50px;
+            padding: 50px 50px 50px 50px;
+        }
+
+        #text-output{
+            margin: 30px;
+            padding: 30px;
+        }
+
+        textarea{
+            width: 500px;
+            height: 150px;
+        }
+
+        .highlighted{
+            background-color: blue;
+        }
+    </style>
+    <script>
+        function getSelectionText() {
+            var text = "";
+            var activeEl = document.activeElement;
+            var activeElTagName = activeEl ? activeEl.tagName.toLowerCase() : null;
+            if (
+                (activeElTagName == "textarea") || (activeElTagName == "input" &&
+                /^(?:text|search|password|tel|url)$/i.test(activeEl.type)) &&
+                (typeof activeEl.selectionStart == "number")
+            ) {
+                text = activeEl.value.slice(activeEl.selectionStart, activeEl.selectionEnd);
+            } else if (window.getSelection) {
+                text = window.getSelection().toString();
+            }
+            return text;
+        }
+
+        document.onmouseup = document.onkeyup = document.onselectionchange = function() {
+
+            document.getElementById("sel").innerHTML = getSelectionText();
+
+            {#console.log(getSelectionText().toString())#}
+        };
+        $(document).ready(function() {
+            $("#enter").click(function () {
+                let selected_text = getSelectionText()
+                let highlighted_text = "<span class='highlighted'>" + selected_text + "</span>"
+                document.getElementById("text-editor").innerHTML =
+                    document.getElementById("text-editor").innerHTML.replace(selected_text, highlighted_text);
+                console.log(getSelectionText().toString());
+                console.log('/');
+                $.ajax({
+                    url: '',
+                    type: 'get',
+                    data: {
+                        selected_text: $("#sel").value,
+                        test_text: 'hello'
+                    },
+                    success: function (response) {
+                    }
+                })
+            })
+        })
+
+    </script>
+{% endblock %}
+
+{% block content %}
+
+    <div id='text-output' class="d-flex justify-content-center text-center">
+        <label for="sel">Selected Keywords: </label>
+        <textarea id="sel" rows="3" cols="50"></textarea>
+        {#        <p id="sel"></p>#}
+        <button id='enter' type="button" class="btn btn-primary ">Mark</button>
+    </div>
+
+
+
+
+    <div id='text-editor' class="border border-primary d-flex justify-content-center text-center">
+        {{ transcript.text }}
+    </div>
+
+
+{% endblock %}
