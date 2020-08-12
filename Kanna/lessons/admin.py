@@ -7,8 +7,8 @@ from .models import *
 
 @admin.register(Script)
 class ScriptAdmin(admin.ModelAdmin):
-    exclude = ('flags',)
-
+    pass
+    # exclude = ('flags',)
 
 admin.site.register(Transcript)
 admin.site.register(CustomUser, UserAdmin)

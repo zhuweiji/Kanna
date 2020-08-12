@@ -145,18 +145,18 @@ def markkeywords(request, pk):
     return render(request, 'editor.html', context=context)
 
 
-class TranscriptEditorView(View):
+class ScriptEditorView(View):
     model = Transcript
     template_name = 'editor.html'
     context_object_name = 'transcript'
 
     def get(self, request, pk, *args, **kwargs):
         context = {
-            'transcript': Transcript.objects.get(pk=pk)
+            'script': Script.objects.get(pk=pk)
         }
-        text = request.GET.get('selected_text')
-        print('text:', text)
-        print(request.GET.get('test_text'))
+        if request.is_ajax():
+            selected_text = request.GET.get('text')
+            print(selected_text)
 
         return render(request, 'editor.html', context=context)
 

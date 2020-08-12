@@ -12,7 +12,7 @@ urlpatterns = [
     path('transcript', views.TranscriptListView.as_view(), name='transcript_list'),
     path('transcript/<int:pk>', views.TranscriptDetailView.as_view(), name='transcript_detail'),
 
-    path('mark/<int:pk>', views.TranscriptEditorView.as_view(), name='mark_keywords'),
+    path('mark/<int:pk>', views.ScriptEditorView.as_view(), name='mark_keywords'),
 
     path('analyse/<int:pk>', views.AnalysisObjView.as_view(), name='analyse_detail'),
 

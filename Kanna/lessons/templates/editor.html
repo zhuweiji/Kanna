@@ -19,6 +19,16 @@
         .highlighted{
             background-color: blue;
         }
+
+        #save_model_keywords{
+            {#position: absolute;#}
+            right: 10px;
+            margin: 50px;
+        }
+
+        #reset_model_keywords{
+
+        }
     </style>
     <script>
         function getSelectionText() {
@@ -55,7 +65,7 @@
                     url: '',
                     type: 'get',
                     data: {
-                        selected_text: $("#sel").value,
+                        text: selected_text.toString(),
                         test_text: 'hello'
                     },
                     success: function (response) {
@@ -74,14 +84,33 @@
         <textarea id="sel" rows="3" cols="50"></textarea>
         {#        <p id="sel"></p>#}
         <button id='enter' type="button" class="btn btn-primary ">Mark</button>
+
     </div>
+
+    <div id="save_model_keywords">
+        <p>When you're done marking your keywords, click here:</p>
+
+        <button id="clear" type="button" class="btn btn-primary">Save all keywords</button>
+    </div>
+
 
 
 
 
     <div id='text-editor' class="border border-primary d-flex justify-content-center text-center">
-        {{ transcript.text }}
+        <p>
+            {{ script.text }}
+        </p>
     </div>
 
 
+    <div id="reset_model_keywords">
+        <p>Otherwise, if you want to reset all keywords in this script:</p>
+        <button id="clear" type="button" class="btn btn-light">Reset</button>
+    </div>
+
+    <br>
+    <br>
+    <br>
+    <br>
 {% endblock %}
