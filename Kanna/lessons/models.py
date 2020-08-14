@@ -18,7 +18,7 @@ class Script(models.Model):
     """ """
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, null=True)
     text = models.TextField()
-    flags = models.TextField(null=True)
+    flags = models.TextField()
 
     def __str__(self):
         return self.topic.name
@@ -26,6 +26,13 @@ class Script(models.Model):
     def get_absolute_url(self):
         return reverse('script_analysis', args=[str(self.pk)])
 
+    def default_script_flags(self):
+        return [0 for _ in self.text]
+
+    def save(self, *args, **kwargs):
+        if not self.flags:
+            self.flags = self.default_script_flags()
+        super().save(*args, **kwargs)
 
 class Transcript(models.Model):
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

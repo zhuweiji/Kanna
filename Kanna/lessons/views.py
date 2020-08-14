@@ -146,17 +146,25 @@ def markkeywords(request, pk):
 
 
 class ScriptEditorView(View):
-    model = Transcript
-    template_name = 'editor.html'
-    context_object_name = 'transcript'
-
     def get(self, request, pk, *args, **kwargs):
+        script = Script.objects.get(pk=pk)
         context = {
-            'script': Script.objects.get(pk=pk)
+            'script': script,
         }
         if request.is_ajax():
-            selected_text = request.GET.get('text')
-            print(selected_text)
+            script_functions = ['highlight', 'reset', 'save']
+
+            ajax_function = request.GET.get('method')
+            if ajax_function == 'reset':
+                script.flags = script.default_script_flags()
+                return render(request, 'editor.html', context=context)
+
+            elif ajax_function == 'save':
+                pass
+
+            print('---------- AJAX log ------------')
+            # print(request.GET.get('reset') == 'True')
+            print('--------------------------------')
 
         return render(request, 'editor.html', context=context)
 
