@@ -153,20 +153,45 @@ class ScriptEditorView(View):
         }
         if request.is_ajax():
             script_functions = ['highlight', 'reset', 'save']
-
             ajax_function = request.GET.get('method')
             if ajax_function == 'reset':
                 script.flags = script.default_script_flags()
+                script.save()
                 return render(request, 'editor.html', context=context)
 
             elif ajax_function == 'save':
-                pass
-
-            print('---------- AJAX log ------------')
-            # print(request.GET.get('reset') == 'True')
-            print('--------------------------------')
+                text = request.GET.get('text')
+                self.mark_flags(text, script)
+                return redirect('')
 
         return render(request, 'editor.html', context=context)
+
+    @staticmethod
+    def mark_flags(htmltext, script):
+        markers = ['<span', 'class="highlighted">', '</span>']
+        text = htmltext.split()
+        script_flags = script.flags
+
+        word_counter = 0
+        is_highlighted = False
+        for word in text:
+            if word.find(markers[2]) != -1:
+                is_highlighted = False
+
+            elif word.find(markers[1]) != -1:
+                is_highlighted = True
+                continue
+
+            if is_highlighted:
+                script_flags[word_counter] = 1
+
+            else:
+                script_flags[word_counter] = 0
+
+            word_counter += 1 if word not in markers else 0
+
+        script.flags = script_flags
+        script.save()
 
 
 class TestAjax(View):

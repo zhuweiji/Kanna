@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 import math
+import re
 # Create your models here.
 
 
@@ -18,7 +19,7 @@ class Script(models.Model):
     """ """
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, null=True)
     text = models.TextField()
-    flags = models.TextField()
+    _flags = models.TextField(blank=True)
 
     def __str__(self):
         return self.topic.name
@@ -27,12 +28,29 @@ class Script(models.Model):
         return reverse('script_analysis', args=[str(self.pk)])
 
     def default_script_flags(self):
-        return [0 for _ in self.text]
+        return [0 for _ in self.text.split()]
+
+    @property
+    def flags(self):
+        val = self._flags.strip('][').split(', ')
+        return val
+
+    @flags.setter
+    def flags(self, value):
+        self._flags = value
+
+    def clean(self):
+        original_text = self.text
+        self.text = re.sub(r'[^\x00-\x7F]+', ' ', original_text)
+        if self.text != original_text:
+            with open('log.txt', 'a+') as f:
+                f.write('Script {self} text cleaned from\n{original_text}\nto\n{self.text}')
 
     def save(self, *args, **kwargs):
-        if not self.flags:
-            self.flags = self.default_script_flags()
+        if not self._flags:
+            self._flags = str(self.default_script_flags())
         super().save(*args, **kwargs)
+
 
 class Transcript(models.Model):
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

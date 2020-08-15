@@ -57,18 +57,24 @@
                 let node = selection.anchorNode;
                 let range = selection.getRangeAt(0);
 
+
                 try {
                     while (selection.toString().indexOf(' ') !== 0) {
                         range.setStart(node, (range.startOffset - 1));
-
-                        while (selection.toString().substr(-1) !== ' ') {
-                            range.setEnd(node, (range.endOffset + 1));
-                        }
                     }
+                    range.setStart(node, (range.startOffset + 1))
                 }
                 catch (DOMException){
-
                 }
+                try{
+                    while (selection.toString().substr(-1) !== ' ') {
+                        range.setEnd(node, (range.endOffset + 1));
+                    }
+                    range.setEnd(node, (range.endOffset - 1));
+                }
+                catch (DOMException){
+                }
+
                 document.getElementById("sel").innerHTML = getSelectionText();
 
             };
@@ -104,15 +110,15 @@
             })
 
             $("#save").click(function(){
+
                 $.ajax({
                     url: '',
                     type: 'get',
                     data:{
                         method: 'save',
-                        text: document.getElementById('#text-editor').innerHTML,
+                        text: document.getElementById('text-editor').innerHTML,
                     },
                     success: function (response) {
-                        location.reload();
                     }
                 })
             })
