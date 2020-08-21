@@ -2,20 +2,14 @@ from django.shortcuts import render, redirect
 from django.views import generic, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView, CreateView
+from django.views.generic import TemplateView, CreateView, FormView
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from .models import *
-
 from .forms import *
 
-# Create your views here.
-
-
-# class LoginRequiredView(LoginRequiredMixin, View):
-#     login_url = 'accounts/login/'
-#     redirect_field_name = 'lessons'
+from .forms import *
 
 @login_required
 def index(request):
@@ -26,15 +20,6 @@ def index(request):
         'user': user
     }
     return render(request, 'index.html', context=context)
-
-#
-# def select_script(request):
-#     context = {
-#         'script_list': Script.objects.all(),
-#
-#     }
-#     print(context['script_list'])
-#     return render(request,'script_list.html', context=context)
 
 
 class ScriptListView(LoginRequiredMixin, generic.ListView):
@@ -73,40 +58,9 @@ class TranscriptDetailView(LoginRequiredMixin, generic.DetailView):
         pass
 
 
-class SelectTranscriptView(generic.detail.SingleObjectMixin, View):
-    model = Transcript
-
-    def post(self, request, *args, **kwargs):
-        myobj = self.get_object()
-        request.session['selected_transcript'] = myobj.id
-        return redirect(...)
-
-
 class CreateScriptView(CreateView):
     template_name = 'script_create.html'
     form_class = ScriptCreateForm
-
-
-# class PreAnalysisView(CreateView):
-#     template_name = 'preanalysis.html'
-#     form_class = AnalysisCreateForm
-#
-#     def form_valid(self, form):
-#         forminstace = form.save(commit=False)
-#         forminstace.user = CustomUser.objects.get(self.request.user)
-#         forminstace.save()
-# def create_analysis_obj(request, pk):
-#     analysis_instance = get_object_or_404(AnalysisObj, pk=pk)
-#     if request.method == 'POST':
-#         form = AnalysisCreateForm(request.POST, user=request.user)
-#
-#         if form.is_valid():
-#             analysis_instance
-
-# def analysis(request):
-#     context = {
-#     }
-#     return render(request, 'index.html', context=context)
 
 
 class AnalysisObjView(LoginRequiredMixin, generic.DetailView):
@@ -116,33 +70,11 @@ class AnalysisObjView(LoginRequiredMixin, generic.DetailView):
 
 
 @login_required
-def analysis(request):
-    context = {
-
-    }
-    return render(request, 'analysis.html', context=context)
-
-
-@login_required
 def record(request):
     context = {
 
     }
     return render(request, 'record.html', context=context)
-
-
-def markkeywords(request, pk):
-    context = {
-        'transcript': Transcript.objects.get(pk=pk)
-    }
-    if request.method == "GET":
-        print('its a get request')
-        text = request.GET.get('selected_text')
-        print(text)
-    if request.method == 'POST':
-        print('its a post request')
-
-    return render(request, 'editor.html', context=context)
 
 
 class ScriptEditorView(View):
@@ -162,7 +94,7 @@ class ScriptEditorView(View):
             elif ajax_function == 'save':
                 text = request.GET.get('text')
                 self.mark_flags(text, script)
-                return redirect('')
+                return redirect('index')
 
         return render(request, 'editor.html', context=context)
 
@@ -170,17 +102,15 @@ class ScriptEditorView(View):
     def mark_flags(htmltext, script):
         markers = ['<span', 'class="highlighted">', '</span>']
         text = htmltext.split()
+        print(text)
+        print(text[2])
         script_flags = script.flags
 
         word_counter = 0
         is_highlighted = False
         for word in text:
-            if word.find(markers[2]) != -1:
-                is_highlighted = False
-
-            elif word.find(markers[1]) != -1:
+            if word.find(markers[1]) != -1:
                 is_highlighted = True
-                continue
 
             if is_highlighted:
                 script_flags[word_counter] = 1
@@ -188,14 +118,29 @@ class ScriptEditorView(View):
             else:
                 script_flags[word_counter] = 0
 
+            if word.find(markers[2]) != -1:
+                is_highlighted = False
+
+            print(word, script_flags[word_counter], word_counter)
+
             word_counter += 1 if word not in markers else 0
 
+        if len(script.text.split()) != len(script_flags):
+            print('\n\n\n\n--------------------')
+            print('flag and text mismatch')
+            print(len(script.text.split()))
+            print(len(script_flags))
         script.flags = script_flags
         script.save()
 
 
-class TestAjax(View):
-    def get(self, request):
-        print(request)
-        return render(request, 'test.html')
+class AnalysisCreateView(LoginRequiredMixin, CreateView):
+    template_name = 'analysis.html'
+    form_class = AnalysisCreateForm
+    success_url = 'index'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
 

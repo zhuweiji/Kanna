@@ -14,7 +14,7 @@ urlpatterns = [
 
     path('mark/<int:pk>', views.ScriptEditorView.as_view(), name='mark_keywords'),
 
+    path('analyse', views.AnalysisCreateView.as_view(), name='analyse'),
     path('analyse/<int:pk>', views.AnalysisObjView.as_view(), name='analyse_detail'),
 
-    path('test', views.TestAjax.as_view(), name='test'),
 ]

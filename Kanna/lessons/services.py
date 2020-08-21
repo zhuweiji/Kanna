@@ -1,6 +1,8 @@
-with open('transcripthtml.txt', 'r') as f:
-    htmltext= f.read()
+from .models import Script
 
-with open('transcript.txt', 'r') as f:
+with open("matthew.txt", "r+") as f:
     text = f.read()
 
+
+script = Script.objects.get(pk=7)
+print(script.flags)

@@ -2,19 +2,27 @@
 {% load static %}
 
 {% block title %} <title></title> {% endblock %}
-
+{% block head %}
+    <style>
+    body{
+        font-size: 0.75em;
+    }
+    </style>
+{%  endblock %}
 {% block content %}
 
 <br>
 <br>
 <br>
 <div class="container">
-    <h2> {{ instance.transcript }}</h2>
-    <h2> {{ instance.transcript.text }}</h2>
-    <h2> {{ instance.script }}</h2>
-    <h2> {{ instance.user }}</h2>
-    <h2> {{ instance.date }}</h2>
-    <h2> {{ instance.score }}</h2>
+    <p> {{ instance.transcript }}</p>
+    <p> {{ instance.transcript.text }}</p>
+    <p>------------------------------</p>
+    <p> {{ instance.script }}</p>
+
+    <p> {{ instance.user }}</p>
+    <p> {{ instance.date }}</p>
+    <p> {{ instance.score }}</p>
 </div>
 
 

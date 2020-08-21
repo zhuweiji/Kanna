@@ -59,7 +59,7 @@ class Transcript(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.topic.name
+        return str(self.topic.name)
 
     def get_absolute_url(self):
         return reverse('transcript_detail', args=[str(self.pk)])
@@ -72,9 +72,12 @@ class CustomUser(AbstractUser):
 class AnalysisObj(models.Model):
     transcript = models.ForeignKey(Transcript, null=True, on_delete=models.CASCADE)
     script = models.ForeignKey(Script, null=True, on_delete=models.CASCADE)
-    # user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
     score = models.IntegerField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        return reverse('analyse_detail', args=[str(self.pk)])
 
     def analyse(self, buffer_len=20):
         if not self.transcript or not self.script:
