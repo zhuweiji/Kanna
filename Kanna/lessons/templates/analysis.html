@@ -5,12 +5,53 @@
 
 {% block content %}
 
-    <div class="container">
-        {% csrf_token %}
-        {{form.as_p}}
-    <button type="submit" class="btn btn-primary "> Analyse </button>
-    </div>
+    {% if submitted %}
+        <p class="success">
+            Your message was submitted successfully. Thank you.
+        </p>
 
+    {% else %}
+
+        <div class="jumbotron" style="color: #d9d9d9; background: #185983">
+            <h1 class="display-4">Evaluate your lesson</h1>
+            <p class="lead">Select one of your transcripts to analyse, and then select a pre-prepared topic to grade against.</p>
+            <hr class="my-4">
+            <p>Your lessons are graded according to several criteria: which include</p>
+            <ul>
+                <li> Hitting of target keywords</li>
+                <li> Tone and excessive usage of fillers </li>
+                <li> tbd </li>
+            </ul>
+            <a class="btn btn-secondary btn-lg" href="#" role="button">Learn more</a>
+        </div>
+
+        <form action="" method="post" novalidate>
+            <table>
+                {% for hidden in form.hidden_fields %}
+                    {{ hidden }}
+                {% endfor %}
+
+                {% for field in form.visible_fields %}
+                    <div class="fieldWrapper">
+                        <p>{{ field.errors }}</p>
+                        <p>{{ field.label_tag }} {{ field }}</p>
+                    </div>
+                {% endfor %}
+                <tr>
+                    <td>&nbsp;</td>
+                    <td><input type="submit" value="Submit"></td>
+                </tr>
+            </table>
+            {% csrf_token %}
+        </form>
+    {% endif %}
+
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
 
 
 {% endblock %}

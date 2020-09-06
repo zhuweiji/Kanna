@@ -63,12 +63,6 @@ class CreateScriptView(CreateView):
     form_class = ScriptCreateForm
 
 
-class AnalysisObjView(LoginRequiredMixin, generic.DetailView):
-    model = AnalysisObj
-    template_name = 'analysis_detail.html'
-    context_object_name = 'instance'
-
-
 @login_required
 def record(request):
     context = {
@@ -121,9 +115,8 @@ class ScriptEditorView(View):
             if word.find(markers[2]) != -1:
                 is_highlighted = False
 
-            print(word, script_flags[word_counter], word_counter)
-
-            word_counter += 1 if word not in markers else 0
+            # print(word, script_flags[word_counter], word_counter)
+            word_counter += 1 if (word not in markers and word_counter < len(script_flags)-1) else 0
 
         if len(script.text.split()) != len(script_flags):
             print('\n\n\n\n--------------------')
@@ -137,10 +130,26 @@ class ScriptEditorView(View):
 class AnalysisCreateView(LoginRequiredMixin, CreateView):
     template_name = 'analysis.html'
     form_class = AnalysisCreateForm
-    success_url = 'index'
+    success_url = '/index'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({'user': self.request.user})
         return kwargs
 
+
+class AnalysisObjView(LoginRequiredMixin, View):
+    def get(self, request, pk, *args, **kwargs):
+        instance = AnalysisObj.objects.get(pk=pk)
+        context = {
+            'instance': instance,
+        }
+        if request.is_ajax():
+            print(request)
+            ajax_function = request.GET.get('method')
+            print(ajax_function)
+            if ajax_function == 'analyse':
+                instance.full_analysis()
+                instance.save()
+
+        return render(request, 'analysis_detail.html', context=context)

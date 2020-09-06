@@ -4,26 +4,47 @@
 {% block title %} <title></title> {% endblock %}
 {% block head %}
     <style>
-    body{
-        font-size: 0.75em;
-    }
+        body{
+            font-size: 0.75em;
+        }
     </style>
+    <script>
+        $(document).ready(function(){
+
+            $("#start_analysis").click(function(){
+                $.ajax({
+                    url: '',
+                    type: 'get',
+                    data:{
+                        method: 'analyse',
+                    },
+                    success: function (response) {
+                        location.reload()
+                    }
+                })
+            })
+        })
+
+    </script>
 {%  endblock %}
 {% block content %}
 
-<br>
-<br>
-<br>
-<div class="container">
-    <p> {{ instance.transcript }}</p>
-    <p> {{ instance.transcript.text }}</p>
-    <p>------------------------------</p>
-    <p> {{ instance.script }}</p>
 
-    <p> {{ instance.user }}</p>
-    <p> {{ instance.date }}</p>
-    <p> {{ instance.score }}</p>
-</div>
+    <br>
+    <br>
+    <br>
+    <div class="container">
+        <p> {{ instance.transcript }}</p>
+        <p> {{ instance.transcript.text }}</p>
+        <p>------------------------------</p>
+        <p> {{ instance.script }}</p>
+        <p>  {{ instance.script.text }}</p>
+        <p> {{ instance.user }}</p>
+        <p> {{ instance.date }}</p>
+        <p> Score: {{ instance.score }}</p>
+        <button id="start_analysis" type="button" class="btn btn-primary">Start Analysis</button>
+
+    </div>
 
 
 {% endblock %}

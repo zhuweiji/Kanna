@@ -64,6 +64,10 @@ class Transcript(models.Model):
     def get_absolute_url(self):
         return reverse('transcript_detail', args=[str(self.pk)])
 
+    def get_cleaned_text(self):
+        original_text = self.text
+        return re.sub(r"[^a-zA-Z' ]", ' ', original_text)
+
 
 class CustomUser(AbstractUser):
     pass
@@ -79,7 +83,67 @@ class AnalysisObj(models.Model):
     def get_absolute_url(self):
         return reverse('analyse_detail', args=[str(self.pk)])
 
-    def analyse(self, buffer_len=20):
+    def get_highlights(self) -> list:
+        """ parses out highlighted key phrases in the script"""
+        text = self.script.text.split()
+        flags = self.script.flags
+        highlights = []
+        phrase = ""
+        for index, word in enumerate(text):
+            if flags[index] == '1':
+                phrase += word + ' '
+            else:
+                if phrase:
+                    highlights.append(phrase)
+                    phrase = ""
+        print('\n\n\n ----------------------- HIGHLIGHTS ------------------')
+        print(highlights)
+        print('\n\n\n ------------------------------------------------------')
+        return highlights
+
+    def analyse_highlight(self, highlight: str) -> float:
+        """ analyse a key phrase; checks for presence of whole phrase in phrases that are 3 words or less
+            otherwise it searches the whole transcript for the phrase until it can match at least half the phrase"""
+        transcript = self.transcript.get_cleaned_text().split()
+        highlight = highlight.split()
+        print('\n\n\n -------------------------TRANSCRIPT -------------------')
+        print(transcript)
+        print('\n\n\n------------------------------------------------------')
+        print('\n\n\n-------------------- SPLIT HIGHLIGHTS -------------------')
+        print(highlight)
+        print('\n\n\n---------------------------------------------------')
+        score = 0
+
+        if 1 <= len(highlight) <= 3:
+            return 1 if all(i in transcript for i in highlight) else 0
+
+        all_starts = [index for index, word in enumerate(transcript) if word == highlight[0]]
+        print('\n\n\n--------------------------- ALL STARTS-----------------------------')
+        print(all_starts)
+        print('\n\n\n----------------------------------------------------------')
+        for start in all_starts:
+            score = 0
+            for index, word in enumerate(highlight):
+                if transcript[start+index] == word:
+                    score += 1
+            if score >= len(highlight)/2:
+                return score/len(highlight)
+        return score/len(highlight)
+
+    def full_analysis(self):
+        score = 0
+        last_pos = 0
+
+        highlights = self.get_highlights()
+        print(highlights)
+        for highlight in highlights:
+            score += self.analyse_highlight(highlight)
+            print('\n\n\n---------------------SCORE-------------------')
+            print(score)
+            print('\n\n\n----------------------------------------------')
+        self.score = score/len(highlights) * 100
+
+    def naive_analysis(self, buffer_len=20):
         if not self.transcript or not self.script:
             return None
 
@@ -104,7 +168,9 @@ class AnalysisObj(models.Model):
                 if index % ratio == 0:
                     list_pointer += 1
                 word_buffer.pop(0)
+            print('\n\n\n------------------------KEYWORD HIT----------------------')
             print(keywords_hit)
+            print('\n\n\n------------------------------------------------------')
         else:
             pass
 

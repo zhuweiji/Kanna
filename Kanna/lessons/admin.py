@@ -12,7 +12,7 @@ class ScriptAdmin(admin.ModelAdmin):
 
 @admin.register(AnalysisObj)
 class AnalysisObjAdmin(admin.ModelAdmin):
-    list_display = ['transcript','script','user','date','score','analyse']
+    list_display = ['transcript','script','user','date','score']
 
 admin.site.register(Transcript)
 admin.site.register(CustomUser, UserAdmin)
