@@ -34,16 +34,44 @@
     <br>
     <br>
     <div class="container">
+
+            <div class="d-flex justify-content-center">
+            <h1 > Report </h1>
+        </div>
+        <p> ----------------------------------------------- </p>
+        <p> Score: {{ instance.score }}</p>
+        <pre> Key Phrases: {{ instance.highlights }}</pre>
+        <br>
+
+        <p> Words Missed: {{ missed_words|safe }}</p>
+        <p> Filler Words: {{ instance.filler_words }}</p>
+        <p> ----------------------------------------------- </p>
+
+        <br>
+        <br>
+        <h1 class="lead"> Here is what you said:</h1>
+        <br>
+        <br>
         <p> {{ instance.transcript }}</p>
         <p> {{ instance.transcript.text }}</p>
         <p>------------------------------</p>
+
+        <br>
+        <h1 class="lead"> Here is a model script to follow</h1>
+        <br>
+        <br>
         <p> {{ instance.script }}</p>
         <p>  {{ instance.script.text }}</p>
         <p> {{ instance.user }}</p>
         <p> {{ instance.date }}</p>
-        <p> Score: {{ instance.score }}</p>
-        <button id="start_analysis" type="button" class="btn btn-primary">Start Analysis</button>
 
+
+
+        <button id="start_analysis" type="button" class="btn btn-primary">Redo Analysis</button>
+        <br>
+        <br>
+        <br>
+        <br>
     </div>
 
 

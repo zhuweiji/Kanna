@@ -1,0 +1,27 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+
+{% block title %} <title></title> {% endblock %}
+{% block head %}
+
+{% endblock %}
+
+{% block content %}
+    <br>
+    <br>
+    <div class="container">
+        <h1 class="lead"> Analysis created so far:</h1>
+        <div class="container">
+            <ul>
+                {% for analysis in analysisobj_list %}
+                    <li style="font-size: 1.25em;">
+                        <a href="{{ analysis.get_absolute_url }}">{{analysis}}</a>
+                        <p style="font-size: 1em;">{{analysis.score}}</p>
+                    </li>
+                    <br>
+                    <br>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

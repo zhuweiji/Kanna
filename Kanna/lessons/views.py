@@ -3,9 +3,10 @@ from django.views import generic, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, CreateView, FormView
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
+from django import template
 from django.http import HttpResponseRedirect, JsonResponse
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from .models import *
 from .forms import *
 
@@ -130,20 +131,57 @@ class ScriptEditorView(View):
 class AnalysisCreateView(LoginRequiredMixin, CreateView):
     template_name = 'analysis.html'
     form_class = AnalysisCreateForm
-    success_url = '/index'
+    success_url = reverse_lazy('index')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs.update({'user': self.request.user})
+        kwargs['request'] = self.request
         return kwargs
+
+    def form_valid(self,form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+
+class AnalysisListView(LoginRequiredMixin, generic.ListView):
+    model = AnalysisObj
+    template_name = 'analysis_list.html'
 
 
 class AnalysisObjView(LoginRequiredMixin, View):
     def get(self, request, pk, *args, **kwargs):
         instance = AnalysisObj.objects.get(pk=pk)
+        misses = instance.highlights_missed
+        print('\n\n\n\n------------------------')
+        print(instance.script.pk)
+        print('\n\n\n------------------------------')
+        if not instance.highlights:
+            return redirect('mark_keywords', pk=instance.script.pk)
+
+        highlights = instance.highlights.split()
+        missed_words = highlights
+        misses = misses.strip('][').split(', ')
+
+        if all(items == 0 for items in misses):
+            return redirect('mark_keywords', pk=instance.script.pk)
+
+        misses_ptr = 0
+        for i,j in enumerate(highlights):
+            if misses[misses_ptr] == '1':
+                missed_words[i] = '<span style="background:#800000">' + missed_words[i] + '</span>'
+
+            try:
+                if misses[misses_ptr+1] == '2':
+                    misses_ptr += 1
+            except IndexError:
+                pass
+
+            misses_ptr += 1
         context = {
             'instance': instance,
+            'missed_words': ' '.join(missed_words)
         }
+
         if request.is_ajax():
             print(request)
             ajax_function = request.GET.get('method')
@@ -153,3 +191,4 @@ class AnalysisObjView(LoginRequiredMixin, View):
                 instance.save()
 
         return render(request, 'analysis_detail.html', context=context)
+

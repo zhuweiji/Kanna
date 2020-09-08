@@ -78,10 +78,11 @@ class AnalysisObj(models.Model):
     script = models.ForeignKey(Script, null=True, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
-    score = models.IntegerField(null=True, blank=True)
 
-    def get_absolute_url(self):
-        return reverse('analyse_detail', args=[str(self.pk)])
+    score = models.IntegerField(null=True, blank=True)
+    highlights = models.TextField(null=True, blank=True)
+    highlights_missed = models.TextField(null=True, blank=True)
+    filler_words = models.TextField(null=True, blank=True)
 
     def get_highlights(self) -> list:
         """ parses out highlighted key phrases in the script"""
@@ -96,81 +97,112 @@ class AnalysisObj(models.Model):
                 if phrase:
                     highlights.append(phrase)
                     phrase = ""
-        print('\n\n\n ----------------------- HIGHLIGHTS ------------------')
-        print(highlights)
-        print('\n\n\n ------------------------------------------------------')
         return highlights
 
-    def analyse_highlight(self, highlight: str) -> float:
+    def analyse_highlight(self, highlight: str, pos: int) -> float:
         """ analyse a key phrase; checks for presence of whole phrase in phrases that are 3 words or less
             otherwise it searches the whole transcript for the phrase until it can match at least half the phrase"""
         transcript = self.transcript.get_cleaned_text().split()
         highlight = highlight.split()
-        print('\n\n\n -------------------------TRANSCRIPT -------------------')
-        print(transcript)
-        print('\n\n\n------------------------------------------------------')
+        highlights_missed = self.highlights_missed
+        missed_pointer = 0 if pos == 0 else [i for i, j in enumerate(highlights_missed) if j == 2][pos-1]
+
         print('\n\n\n-------------------- SPLIT HIGHLIGHTS -------------------')
         print(highlight)
         print('\n\n\n---------------------------------------------------')
+
         score = 0
 
         if 1 <= len(highlight) <= 3:
-            return 1 if all(i in transcript for i in highlight) else 0
+            if all(i in transcript for i in highlight):
+                return 1
+            else:
+                self.highlights_missed[missed_pointer:missed_pointer+len(highlight)] = 1
+                return 0
 
         all_starts = [index for index, word in enumerate(transcript) if word == highlight[0]]
+
         print('\n\n\n--------------------------- ALL STARTS-----------------------------')
         print(all_starts)
         print('\n\n\n----------------------------------------------------------')
+
         for start in all_starts:
             score = 0
             for index, word in enumerate(highlight):
                 if transcript[start+index] == word:
                     score += 1
+                else:
+                    pass
+                    self.highlights_missed[missed_pointer] = 1
+                missed_pointer += 1
             if score >= len(highlight)/2:
                 return score/len(highlight)
+
         return score/len(highlight)
 
-    def full_analysis(self):
+    def full_analysis(self) -> None:
         score = 0
         last_pos = 0
 
         highlights = self.get_highlights()
+        if not highlights:
+            self.score = None
+            return
+
         print(highlights)
-        for highlight in highlights:
-            score += self.analyse_highlight(highlight)
+        for pos, highlight in enumerate(highlights):
+            score += self.analyse_highlight(highlight, pos)
             print('\n\n\n---------------------SCORE-------------------')
             print(score)
             print('\n\n\n----------------------------------------------')
         self.score = score/len(highlights) * 100
 
-    def naive_analysis(self, buffer_len=20):
-        if not self.transcript or not self.script:
-            return None
+    def get_absolute_url(self):
+        return reverse('analyse_detail', args=[str(self.pk)])
 
-        transcript_text = self.transcript.text
-        script_text = self.script.text
+    def save(self, *args, **kwargs):
+        highlights = self.get_highlights()
+        self.highlights = '\n'.join(phrase for phrase in highlights)
+        temp = []
+        for phrase in highlights:
+            temp += (0 for word in phrase.split())
+            temp.append(2) if phrase != highlights[-1] else None
+        self.highlights_missed = temp
 
-        split_transcript = transcript_text.split()
-        split_script = script_text.split()
+        self.full_analysis()
+        super().save()
 
-        word_buffer = []
-        filler_words_used = []
-        keywords_hit = set()
-        list_pointer = 0
-
-        if len(split_transcript) >= len(split_script):
-            ratio = math.ceil(len(split_transcript)/len(split_script))
-            word_buffer += split_transcript[:buffer_len]
-            for index, word in enumerate(split_transcript[buffer_len:]):
-                word_buffer.append(word)
-                if split_script[list_pointer] in word_buffer:
-                    keywords_hit.add(split_script[list_pointer])
-                if index % ratio == 0:
-                    list_pointer += 1
-                word_buffer.pop(0)
-            print('\n\n\n------------------------KEYWORD HIT----------------------')
-            print(keywords_hit)
-            print('\n\n\n------------------------------------------------------')
-        else:
-            pass
+    def __str__(self):
+        return self.script.topic.name + ' -> ' + self.transcript.topic.name
+    # def naive_analysis(self, buffer_len=20):
+    #     """ unused """
+    #     if not self.transcript or not self.script:
+    #         return None
+    #
+    #     transcript_text = self.transcript.text
+    #     script_text = self.script.text
+    #
+    #     split_transcript = transcript_text.split()
+    #     split_script = script_text.split()
+    #
+    #     word_buffer = []
+    #     filler_words_used = []
+    #     keywords_hit = set()
+    #     list_pointer = 0
+    #
+    #     if len(split_transcript) >= len(split_script):
+    #         ratio = math.ceil(len(split_transcript)/len(split_script))
+    #         word_buffer += split_transcript[:buffer_len]
+    #         for index, word in enumerate(split_transcript[buffer_len:]):
+    #             word_buffer.append(word)
+    #             if split_script[list_pointer] in word_buffer:
+    #                 keywords_hit.add(split_script[list_pointer])
+    #             if index % ratio == 0:
+    #                 list_pointer += 1
+    #             word_buffer.pop(0)
+    #         print('\n\n\n------------------------KEYWORD HIT----------------------')
+    #         print(keywords_hit)
+    #         print('\n\n\n------------------------------------------------------')
+    #     else:
+    #         pass
 
