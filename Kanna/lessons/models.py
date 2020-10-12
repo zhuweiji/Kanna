@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from .services import listify
 import math
 import re
 # Create your models here.
@@ -17,7 +18,7 @@ class Topic(models.Model):
 
 class Script(models.Model):
     """ """
-    topic = models.ForeignKey(Topic, on_delete=models.CASCADE, null=True)
+    topic = models.ForeignKey(Topic, on_delete=models.CASCADE, null=True)   # todo onetoonefield
     text = models.TextField()
     _flags = models.TextField(blank=True)
 
@@ -39,7 +40,12 @@ class Script(models.Model):
     def flags(self, value):
         self._flags = value
 
+    def get_cleaned_text(self):
+        original_text = self.text
+        return re.sub(r"[^a-zA-Z' ]", ' ', original_text)
+
     def clean(self):
+        # possibly unused
         original_text = self.text
         self.text = re.sub(r'[^\x00-\x7F]+', ' ', original_text)
         if self.text != original_text:
@@ -86,8 +92,10 @@ class AnalysisObj(models.Model):
 
     def get_highlights(self) -> list:
         """ parses out highlighted key phrases in the script"""
-        text = self.script.text.split()
+        text = self.script.get_cleaned_text().split()
         flags = self.script.flags
+        if all(i == '0' for i in flags):
+            return []
         highlights = []
         phrase = ""
         for index, word in enumerate(text):
@@ -104,12 +112,21 @@ class AnalysisObj(models.Model):
             otherwise it searches the whole transcript for the phrase until it can match at least half the phrase"""
         transcript = self.transcript.get_cleaned_text().split()
         highlight = highlight.split()
-        highlights_missed = self.highlights_missed
-        missed_pointer = 0 if pos == 0 else [i for i, j in enumerate(highlights_missed) if j == 2][pos-1]
 
-        print('\n\n\n-------------------- SPLIT HIGHLIGHTS -------------------')
+        if not isinstance(self.highlights_missed, list):
+            highlights_missed = self.highlights_missed.strip('][').split(', ')
+        else:
+            highlights_missed = self.highlights_missed
+        print('highlight', highlight)
+        print(highlights_missed)
+        print(type(highlights_missed))
+        # missed pointer set to starting index of highlight within highlights_missed
+        missed_pointer = 0 if pos == 0 \
+            else [i for i, j in enumerate(highlights_missed) if j == '2' or 2][pos-1]
+        print('\n-------------------- SPLIT HIGHLIGHTS -------------------')
         print(highlight)
-        print('\n\n\n---------------------------------------------------')
+        print(missed_pointer)
+        print('\n---------------------------------------------------')
 
         score = 0
 
@@ -122,23 +139,28 @@ class AnalysisObj(models.Model):
 
         all_starts = [index for index, word in enumerate(transcript) if word == highlight[0]]
 
-        print('\n\n\n--------------------------- ALL STARTS-----------------------------')
+        print('\n--------------------------- ALL STARTS-----------------------------')
         print(all_starts)
-        print('\n\n\n----------------------------------------------------------')
+        print('\n----------------------------------------------------------')
+        results = {}
+        temp_highlights_missed = highlights_missed[:]
 
         for start in all_starts:
+            temp_missed_pointer = missed_pointer
+            temp_highlights_missed = highlights_missed[:]
             score = 0
+
             for index, word in enumerate(highlight):
                 if transcript[start+index] == word:
                     score += 1
                 else:
-                    pass
-                    self.highlights_missed[missed_pointer] = 1
-                missed_pointer += 1
-            if score >= len(highlight)/2:
-                return score/len(highlight)
-
-        return score/len(highlight)
+                    temp_highlights_missed[temp_missed_pointer] = '1'
+                temp_missed_pointer += 1
+            results[score] = temp_highlights_missed
+        max_score = max([key for key,val in results.items()])
+        self.highlights_missed = list(map(int, results[max_score]))
+        print(self.highlights_missed)
+        return max_score/len(highlight)
 
     def full_analysis(self) -> None:
         score = 0
@@ -155,6 +177,8 @@ class AnalysisObj(models.Model):
             print('\n\n\n---------------------SCORE-------------------')
             print(score)
             print('\n\n\n----------------------------------------------')
+        print('HELLO')
+        print(self.highlights_missed)
         self.score = score/len(highlights) * 100
 
     def get_absolute_url(self):
@@ -162,14 +186,15 @@ class AnalysisObj(models.Model):
 
     def save(self, *args, **kwargs):
         highlights = self.get_highlights()
-        self.highlights = '\n'.join(phrase for phrase in highlights)
+        self.highlights = '\n'.join(highlight for highlight in highlights)
         temp = []
-        for phrase in highlights:
-            temp += (0 for word in phrase.split())
-            temp.append(2) if phrase != highlights[-1] else None
-        self.highlights_missed = temp
+        if not self.highlights_missed:
+            for highlight in highlights:
+                temp += (0 for word in highlight.split())
+                temp.append(2) if highlight != highlights[-1] else None
+            self.highlights_missed = temp
 
-        self.full_analysis()
+        # self.full_analysis()
         super().save()
 
     def __str__(self):

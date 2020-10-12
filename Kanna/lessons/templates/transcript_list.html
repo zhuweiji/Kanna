@@ -2,27 +2,36 @@
 {% load static %}
 
 {% block title %} <title>Transcripts</title> {% endblock %}
-
+{% block head %}
+    <style>
+        #transcript-border{
+            margin: 50px;
+            padding: 50px;
+        }
+    </style>
+{% endblock %}
 {% block content %}
-<!--{% if object_list %}-->
+    <!--{% if object_list %}-->
 
-<div class="container">
-    <p></p>
-    <h1 class="lead">Available transcripts:</h1>
+        <div class="container">
+            <p></p>
+            <br>
+            <h1 class="lead" style="font-size: 1.25em;">Transcripts you have created:</h1>
 
-    <br>
-    <ul>
-        {% for transcript in transcript_list %}
-        <li>
-            <a href="{{ transcript.get_absolute_url }}">{{transcript}}</a>
-            <p>{{transcript.text}}</p>
-        </li>
-        {% endfor %}
-    </ul>
-</div>
-<!--    {% else %}-->
-<!--        <p> There are no scripts for this user.</p>-->
-<!--    {% endif %}-->
+
+            <ul>
+                {% for transcript in transcript_list %}
+                        <div id="transcript-border" class="border border-danger rounded">
+                            <a href="{{ transcript.get_absolute_url }}">{{transcript}}</a>
+                            <p>{{transcript.text|truncatewords:200}}</p>
+                        </div>
+                        <br>
+                {% endfor %}
+            </ul>
+        </div>
+        <!--    {% else %}-->
+        <!--        <p> There are no scripts for this user.</p>-->
+        <!--    {% endif %}-->
 
 
 

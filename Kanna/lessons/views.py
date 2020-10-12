@@ -9,8 +9,10 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse, reverse_lazy
 from .models import *
 from .forms import *
+from .services import listify
 
 from .forms import *
+
 
 @login_required
 def index(request):
@@ -152,26 +154,28 @@ class AnalysisObjView(LoginRequiredMixin, View):
     def get(self, request, pk, *args, **kwargs):
         instance = AnalysisObj.objects.get(pk=pk)
         misses = instance.highlights_missed
-        print('\n\n\n\n------------------------')
-        print(instance.script.pk)
-        print('\n\n\n------------------------------')
         if not instance.highlights:
             return redirect('mark_keywords', pk=instance.script.pk)
 
         highlights = instance.highlights.split()
         missed_words = highlights
         misses = misses.strip('][').split(', ')
+        print(misses)
+        print(type(misses))
 
         if all(items == 0 for items in misses):
             return redirect('mark_keywords', pk=instance.script.pk)
 
         misses_ptr = 0
-        for i,j in enumerate(highlights):
+        no_misses = True
+        for i, j in enumerate(highlights):
             if misses[misses_ptr] == '1':
                 missed_words[i] = '<span style="background:#800000">' + missed_words[i] + '</span>'
+                no_misses = False
 
             try:
                 if misses[misses_ptr+1] == '2':
+                    missed_words[i] = missed_words[i] + "<br>"
                     misses_ptr += 1
             except IndexError:
                 pass
@@ -179,7 +183,8 @@ class AnalysisObjView(LoginRequiredMixin, View):
             misses_ptr += 1
         context = {
             'instance': instance,
-            'missed_words': ' '.join(missed_words)
+            'missed_words': ' '.join(missed_words),
+            'no_misses': no_misses
         }
 
         if request.is_ajax():

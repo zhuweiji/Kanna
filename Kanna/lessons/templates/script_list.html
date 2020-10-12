@@ -2,7 +2,14 @@
 {% load static %}
 
 {% block title %} <title>Lesson Analysis</title> {% endblock %}
-
+{% block head %}
+    <style>
+        #script-border{
+            margin: 50px;
+            padding: 50px;
+        }
+    </style>
+{% endblock %}
 {% block content %}
 <!--{% if object_list %}-->
 
@@ -10,15 +17,18 @@
 <br>
 <div class="container">
 
-    <h1 class="lead"> Your scripts:</h1>
+    <h1 class="lead" style="font-size: 1.25em;"> Model scripts you should follow</h1>
     <div class="container">
-        <br>
+
         <ul>
             {% for script in script_list %}
-                <li style="font-size: 1.25em;">
-                    <a href="{{ script.get_absolute_url }}">{{script}}</a>
-                    <p style="font-size: 0.75em;">{{script.text}}</p>
-                </li>
+                    <div id="script-border" class="border border-danger rounded">
+                        <a href="{{ script.get_absolute_url }}">{{script}}</a>
+                        <p>{{script.text|truncatewords:100}}</p>
+                    </div>
+                <br>
+
+
 
             {% endfor %}
         </ul>

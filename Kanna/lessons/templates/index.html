@@ -2,20 +2,60 @@
 {% load static %}
 
 {% block title %} <title>Main Page</title> {% endblock %}
+{% block head %}
+    <style>
+        body{
+            background-image: url("{% static 'image1.jpg' %}");
+            background-size: cover;
+            height: 100vh;
+            color: #333333;
+        }
+        h1{
+            font-size: 3.5rem;
+            text-shadow: #333333 2px 1px 3px ;
+        }
+    </style>
+{% endblock %}
 {% block content %}
 
-<div style="background-image: url({% static 'image1.jpg' %});"></div>
-<div class="container">
-<!--    <h1 style="text-align:center; padding:10px;">Welcome!</h1>-->
-    <br><br><br>
-    <br>
-    <h1 class="display-2 text-center">Welcome {{user}}!</h1>
-    <br>
-    <br>
+    <div class="container">
+        <!--    <h1 style="text-align:center; padding:10px;">Welcome!</h1>-->
+        <br><br><br>
+        <br>
+        <div id="banner">
+            <h1>Welcome {{user}}!</h1>
+        </div>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
 
-<!--    <img src="{% static 'image1.jpg' %}" alt="" style="object-fit: cover;">-->
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="card text-white bg-dark mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">View your history</h5>
+                        <p class="card-text">Check your past lessons and view past reports</p>
+                        <a href="{% url 'analyse' %}" class="btn btn-outline-info">Analyse</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="card text-white bg-dark mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Record a new lesson</h5>
+                        <p class="card-text">Start recording a new trial lesson to evaluate against created lessons</p>
+                        <a href="{% url 'record' %}" class="btn btn-outline-info">Start recording</a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-</div>
+
+
+    </div>
 
 
 {% endblock %}

@@ -43,7 +43,12 @@
         <pre> Key Phrases: {{ instance.highlights }}</pre>
         <br>
 
-        <p> Words Missed: {{ missed_words|safe }}</p>
+        <p> Words Missed:
+            {% if no_misses == False %}
+            {{ missed_words|safe }}
+            {% else %}
+            {% endif %}
+        </p>
         <p> Filler Words: {{ instance.filler_words }}</p>
         <p> ----------------------------------------------- </p>
 

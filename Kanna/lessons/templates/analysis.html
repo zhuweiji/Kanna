@@ -2,7 +2,16 @@
 {% load static %}
 
 {% block title %} <title>Analysis</title> {% endblock %}
-
+{% block head %}
+    <style>
+        body{
+            background-image: url("{% static 'image2.png' %}");
+            background-size: cover;
+            height: 100vh;
+            color: #333333;
+        }
+    </style>
+{% endblock %}
 {% block content %}
 
     {% if submitted %}
@@ -11,19 +20,44 @@
         </p>
 
     {% else %}
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <div class="d-flex align-items-center justify-content-center">
+        {#        <div class="jumbotron" style="color: #d9d9d9; background: #185983">#}
+        {#            <h1 class="display-4">Evaluate your lesson</h1>#}
+        {#            <p class="lead">Select one of your transcripts to analyse, and then select a pre-prepared topic to grade against.</p>#}
+        {#            <hr class="my-4">#}
+        {#            <p>Your lessons are graded according to several criteria: which include</p>#}
+        {#            <ul>#}
+        {#                <li> Hitting of target keywords</li>#}
+        {#                <li> Tone and excessive usage of fillers </li>#}
+        {#                <li> tbd </li>#}
+        {#            </ul>#}
+        {#            <a class="btn btn-secondary btn-lg" href="#" role="button">Learn more</a>#}
+        {#        </div>#}
 
-        <div class="jumbotron" style="color: #d9d9d9; background: #185983">
-            <h1 class="display-4">Evaluate your lesson</h1>
-            <p class="lead">Select one of your transcripts to analyse, and then select a pre-prepared topic to grade against.</p>
-            <hr class="my-4">
-            <p>Your lessons are graded according to several criteria: which include</p>
-            <ul>
-                <li> Hitting of target keywords</li>
-                <li> Tone and excessive usage of fillers </li>
-                <li> tbd </li>
-            </ul>
-            <a class="btn btn-secondary btn-lg" href="#" role="button">Learn more</a>
+        <div class="card text-white border-primary bg-dark mb-6" style="max-width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Analyse your transcript</h5>
+                    <p class="card-text">Your lessons are graded according to several criteria: which include</p>
+                    <ul>
+                        <li> Hitting of target keywords</li>
+                        <li> Tone and excessive usage of fillers </li>
+                        <li> tbd </li>
+                    </ul>
+{#                <a href="#" class="btn btn-primary">Go somewhere</a>#}
+            </div>
         </div>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-center">
 
         <form action="" method="post" novalidate>
             <table>
@@ -32,7 +66,7 @@
                 {% endfor %}
 
                 {% for field in form.visible_fields %}
-                    <div class="fieldWrapper">
+                    <div class="fieldWrapper" style="color:black;">
                         <p>{{ field.errors }}</p>
                         <p>{{ field.label_tag }} {{ field }}</p>
                     </div>
@@ -46,12 +80,12 @@
         </form>
     {% endif %}
 
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+    </div>
 
 {% endblock %}
