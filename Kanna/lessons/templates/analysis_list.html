@@ -3,25 +3,73 @@
 
 {% block title %} <title></title> {% endblock %}
 {% block head %}
+    <style>
+        {#body{#}
+        {#    background-image: url("{% static "image2.png" %}");#}
+        {#    background-size: cover;#}
+        {#    height: 130vh;#}
+        {# }#}
+        .styled-table {
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9em;
+            font-family: sans-serif;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+            position: absolute;
+            left: 30%;
+        }
+        .styled-table thead tr {
+            background-color: #343a40;
+            color: #ffffff;
+            text-align: left;
+        }
+        .styled-table th,
+        .styled-table td {
+            padding: 12px 15px;
+        }
+        .styled-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
 
+        .styled-table tbody tr:last-of-type {
+            border-bottom: 2px solid #343a40;
+        }
+        .styled-table tbody tr.active-row {
+            font-weight: bold;
+            color: #343a40;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
     <br>
     <br>
+    <br>
+
     <div class="container">
-        <h1 class="lead"> Analysis created so far:</h1>
-        <div class="container">
-            <ul>
-                {% for analysis in analysisobj_list %}
-                    <li style="font-size: 1.25em;">
-                        <a href="{{ analysis.get_absolute_url }}">{{analysis}}</a>
-                        <p style="font-size: 1em;">{{analysis.score}}</p>
-                    </li>
-                    <br>
-                    <br>
-                {% endfor %}
-            </ul>
-        </div>
+        <table class="styled-table">
+            <thead>
+            <tr>
+                <th>Topic</th>
+                <th>Score</th>
+                <th>Date created</th>
+            </tr>
+            </thead>
+            {% for analysis in analysisobj_list %}
+                <tr>
+                    <td> <a href="{{ analysis.get_absolute_url }}">{{analysis}}</a> </td>
+                    <td> <p style="font-size: 1em;">
+                        {% if analysis.score == None %}
+                            Unanalysed
+                        {% else %}
+                            {{analysis.score}}
+                        {% endif %}
+                    </p> </td>
+                    <td> <p>{{ analysis.date }}</p> </td>
+                </tr>
+            {% endfor %}
+        </table>
     </div>
+
 {% endblock %}

@@ -42,6 +42,7 @@ class Script(models.Model):
 
     def get_cleaned_text(self):
         original_text = self.text
+        # todo convert numbers into alphabets (1 -> one)
         return re.sub(r"[^a-zA-Z' ]", ' ', original_text)
 
     def clean(self):
@@ -118,15 +119,14 @@ class AnalysisObj(models.Model):
         else:
             highlights_missed = self.highlights_missed
         print('highlight', highlight)
-        print(highlights_missed)
+        print('highlights_missed:', highlights_missed)
         print(type(highlights_missed))
         # missed pointer set to starting index of highlight within highlights_missed
         missed_pointer = 0 if pos == 0 \
-            else [i for i, j in enumerate(highlights_missed) if j == '2' or 2][pos-1]
+            else [i for i, j in enumerate(highlights_missed) if j == '2' or j == 2][pos-1] + 1
         print('\n-------------------- SPLIT HIGHLIGHTS -------------------')
         print(highlight)
-        print(missed_pointer)
-        print('\n---------------------------------------------------')
+        print('missed pointer=',missed_pointer)
 
         score = 0
 
@@ -134,22 +134,25 @@ class AnalysisObj(models.Model):
             if all(i in transcript for i in highlight):
                 return 1
             else:
-                self.highlights_missed[missed_pointer:missed_pointer+len(highlight)] = 1
+                highlights_missed[missed_pointer:missed_pointer + len(highlight)] = [1 for _ in range(len(highlight))]
+                self.highlights_missed = highlights_missed
                 return 0
 
         all_starts = [index for index, word in enumerate(transcript) if word == highlight[0]]
+        if not all_starts:
+            highlights_missed[missed_pointer:missed_pointer + len(highlight)] = [1 for _ in range(len(highlight))]
+            self.highlights_missed = highlights_missed
+            return 0
 
         print('\n--------------------------- ALL STARTS-----------------------------')
         print(all_starts)
-        print('\n----------------------------------------------------------')
         results = {}
-        temp_highlights_missed = highlights_missed[:]
+        temp_highlights_missed = highlights_missed[:]  # possibly can take out
 
         for start in all_starts:
             temp_missed_pointer = missed_pointer
             temp_highlights_missed = highlights_missed[:]
             score = 0
-
             for index, word in enumerate(highlight):
                 if transcript[start+index] == word:
                     score += 1
@@ -157,13 +160,16 @@ class AnalysisObj(models.Model):
                     temp_highlights_missed[temp_missed_pointer] = '1'
                 temp_missed_pointer += 1
             results[score] = temp_highlights_missed
-        max_score = max([key for key,val in results.items()])
+        max_score = max([key for key, val in results.items()])
         self.highlights_missed = list(map(int, results[max_score]))
         print(self.highlights_missed)
         return max_score/len(highlight)
 
     def full_analysis(self) -> None:
         score = 0
+        self.score = score
+        self.highlights_missed = None
+        self.save()  # resets highlights missed by calling save on AnalysisObj with no highlights_missed
         last_pos = 0
 
         highlights = self.get_highlights()
@@ -176,8 +182,6 @@ class AnalysisObj(models.Model):
             score += self.analyse_highlight(highlight, pos)
             print('\n\n\n---------------------SCORE-------------------')
             print(score)
-            print('\n\n\n----------------------------------------------')
-        print('HELLO')
         print(self.highlights_missed)
         self.score = score/len(highlights) * 100
 
@@ -198,7 +202,7 @@ class AnalysisObj(models.Model):
         super().save()
 
     def __str__(self):
-        return self.script.topic.name + ' -> ' + self.transcript.topic.name
+        return self.script.topic.name
     # def naive_analysis(self, buffer_len=20):
     #     """ unused """
     #     if not self.transcript or not self.script:

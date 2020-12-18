@@ -133,7 +133,7 @@ class ScriptEditorView(View):
 class AnalysisCreateView(LoginRequiredMixin, CreateView):
     template_name = 'analysis.html'
     form_class = AnalysisCreateForm
-    success_url = reverse_lazy('index')
+    # success_url = reverse_lazy('index')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -163,7 +163,7 @@ class AnalysisObjView(LoginRequiredMixin, View):
         print(misses)
         print(type(misses))
 
-        if all(items == 0 for items in misses):
+        if all(items == 0 for items in misses):  # redirects unhighlighted scripts to editor page
             return redirect('mark_keywords', pk=instance.script.pk)
 
         misses_ptr = 0

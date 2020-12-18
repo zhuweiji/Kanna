@@ -10,21 +10,56 @@
             height: 100vh;
             color: #333333;
         }
+
+        {#.bg-image{            #}
+        {#    background-image: url("{% static 'image1.jpg' %}");#}
+        {##}
+        {#    /* Add the blur effect */#}
+        {#    filter: blur(8px);#}
+        {#    -webkit-filter: blur(8px);#}
+        {##}
+        {#    /* Full height */#}
+        {#    height: 100%;#}
+        {##}
+        {#    /* Center and scale the image nicely */#}
+        {#    background-position: center;#}
+        {#    background-repeat: no-repeat;#}
+        {#    background-size: cover;#}
+        {# }#}
         h1{
             font-size: 3.5rem;
             text-shadow: #333333 2px 1px 3px ;
+        }
+        #banner{
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0, 0.4); /* Black w/opacity/see-through */
+            color: white;
+            font-weight: bold;
+            {#border: 3px solid #f1f1f1;#}
+
+        }
+        #banner-out{
+            position: absolute;
+            left: 10%
         }
     </style>
 {% endblock %}
 {% block content %}
 
+    <div class="bg-image"></div>
+
+    <br><br><br>
+    <br><br><br><br>
+    <div id="banner-out">
+        <h1 ><span id="banner">Welcome {{user}}!</span></h1>
+    </div>
+
     <div class="container">
         <!--    <h1 style="text-align:center; padding:10px;">Welcome!</h1>-->
-        <br><br><br>
+
         <br>
-        <div id="banner">
-            <h1>Welcome {{user}}!</h1>
-        </div>
+        <br>
+        <br>
         <br>
         <br>
         <br>
