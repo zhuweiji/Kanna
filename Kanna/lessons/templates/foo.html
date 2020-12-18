@@ -1,0 +1,46 @@
+<script>
+            function getSelectionText() {
+                let selection = window.getSelection();
+                let node = selection.anchorNode;
+                let range = selection.getRangeAt(0);
+
+                while(selection.toString().indexOf(' ') !== 0){
+                    range.setStart(node, (range.startOffset - 1));
+                }
+                while(selection.toString().substr(-1) !== ' '){
+                    range.setEnd(node, (range.endOffset +1));
+                }
+
+                return range.toString();
+            }
+
+                        function getAllHighlighted(){
+                return $(".highlight")
+            }
+        $(document).ready(function() {
+           document.onmouseup = document.onkeyup = document.onselectionchange = function() {
+                let text = getSelectionText();
+                document.getElementById("sel").innerHTML = getSelectionText();
+                {#console.log(getSelectionText().toString())#}
+            };
+
+            $("#enter").click(function () {
+                let selected_text = getSelectionText()
+                console.log(selected_text);
+                let highlighted_text = "<span class='highlighted'>" + selected_text + "</span>"
+                document.getElementById("text-editor").innerHTML =
+                    document.getElementById("text-editor").innerHTML.replace(selected_text, highlighted_text);
+
+                console.log('/');
+                {#$.ajax({#}
+                {#    url: '',#}
+                {#    type: 'get',#}
+                {#    data: {#}
+                {#        method: 'highlight',#}
+                {#        text: selected_text.toString(),#}
+                {#    },#}
+                {#    success: function (response) {#}
+                {#    }#}
+                {# })#}
+            })
+</script>

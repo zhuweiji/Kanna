@@ -1,0 +1,35 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+    <div class="container">
+        <br>
+        <br>
+        <br>
+        <br>
+
+        <button>hello</button>
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            $('button').click(function(){
+                {#alert('called')#}
+                $.ajax({
+                    type: 'get',
+                    url: '',
+                    data: {
+                        'button_text': 'hello'
+                    },
+                    success: function(response){
+                        console.log(response.text)
+                        alert('success');
+                    },
+                    error: function(xhr, status, error){
+                        alert(xhr + status + error);
+                    }
+                });
+            });
+        });
+    </script>
+
+{% endblock %}
