@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('record', views.record, name='record'),
+    path('record', views.RecordView.as_view(), name='record'),
 
     path('script', views.ScriptListView.as_view(), name='script_list'),
     path('script/<int:pk>', views.ScriptDetailView.as_view(), name='script_analysis'),
@@ -17,5 +17,7 @@ urlpatterns = [
     path('start_new_analysis', views.AnalysisCreateView.as_view(), name='analyse'),
     path('analyse', views.AnalysisListView.as_view(), name='analyse_list'),
     path('analyse/<int:pk>', views.AnalysisObjView.as_view(), name='analyse_detail'),
+
+    path('uploadsuccess', views.AudioUploadSuccessView.as_view(), name='upload_audio_success'),
 
 ]

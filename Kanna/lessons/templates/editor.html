@@ -49,7 +49,7 @@
             document.onselectionchange = function() {
                 let text = getSelectionText();
                 document.getElementById("sel").innerHTML = getSelectionText();
-                {#console.log(getSelectionText().toString())#}
+                // {#console.log(getSelectionText().toString())#}
             };
 
             document.onmouseup = function(){
@@ -120,7 +120,7 @@
                         text: document.getElementById('text-editor').innerHTML,
                     },
                     success: function (response) {
-                    {# todo redirect on success instead of using <a> tag to redirect #}
+                    // {# todo redirect on success instead of using <a> tag to redirect #}
                     }
                 })
             })
@@ -134,7 +134,7 @@
     <div id='text-output' class="d-flex justify-content-center text-center">
         <label for="sel">Selected Keywords: </label>
         <textarea readonly id="sel" rows="3" cols="50"></textarea>
-        {#        <p id="sel"></p>#}
+<!--        {#        <p id="sel"></p>#}-->
         <button id='enter' type="button" class="btn btn-primary ">Mark</button>
 
     </div>

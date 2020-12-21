@@ -6,18 +6,15 @@ from .models import *
 class AnalysisCreateForm(forms.ModelForm):
     class Meta:
         model = AnalysisObj
-        exclude = ['user','date','score','highlights','highlights_missed','filler_words']
+        exclude = ['user', 'date', 'score', 'highlights', 'highlights_missed', 'filler_words']
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request")
         super(AnalysisCreateForm, self).__init__(*args, **kwargs)
     #     print(self.fields)
     #     print(self.request.user)
-        # self.fields['user'] = self.request.user
-        # print('\n\n\n\n\n', self.request)
-
-
-
+    # self.fields['user'] = self.request.user
+    # print('\n\n\n\n\n', self.request)
 
     # def save(self, commit=True):
     #     inst = super(AnalysisCreateForm, self).save(commit=False)
@@ -33,3 +30,12 @@ class ScriptCreateForm(forms.ModelForm):
     class Meta:
         model = Script
         fields = ['topic', 'text']
+
+
+class SimpleAudioForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        model = SimpleAudioFile
+        fields = ("__all__")

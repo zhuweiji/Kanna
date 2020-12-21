@@ -60,6 +60,7 @@ class Script(models.Model):
 
 
 class Transcript(models.Model):
+    audio = models.FileField(upload_to='audio/', null=True)
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, null=True)
     text = models.TextField()
@@ -75,6 +76,9 @@ class Transcript(models.Model):
         original_text = self.text
         return re.sub(r"[^a-zA-Z' ]", ' ', original_text)
 
+
+class SimpleAudioFile(models.Model):
+    audio = models.FileField(upload_to='audio/')
 
 class CustomUser(AbstractUser):
     pass

@@ -17,3 +17,4 @@ class AnalysisObjAdmin(admin.ModelAdmin):
 admin.site.register(Transcript)
 admin.site.register(CustomUser, UserAdmin)
 admin.site.register(Topic)
+admin.site.register(SimpleAudioFile)

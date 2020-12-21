@@ -61,21 +61,49 @@ class TranscriptDetailView(LoginRequiredMixin, generic.DetailView):
         pass
 
 
-class CreateScriptView(CreateView):
+class CreateScriptView(LoginRequiredMixin, CreateView):
     template_name = 'script_create.html'
     form_class = ScriptCreateForm
 
 
-@login_required
-def record(request):
-    context = {
+class RecordView(LoginRequiredMixin, View):
+    def get(self, request):
+        context = {
 
-    }
-    return render(request, 'record.html', context=context)
+        }
+        return render(request, 'record.html', context=context)
+
+    def post(self, request):
+        if request.is_ajax():
+            """ save recorded audio blob or uploaded audio by user """
+            audio_file = request.POST.get("audio")
+
+            form = SimpleAudioForm(request.POST, request.FILES)
+            if form.is_valid():
+                print('here')
+                form.save()
+                return redirect('index')
+
+            # print(0)
+            # obj = SimpleAudioFile()
+            # print(1)
+            # obj.audio = request.POST.get("audio")
+            # print(2)
+            # obj.save()
+            # print(3)
+
+            # form = SimpleAudioForm(request.POST)
+            # print(form)
+            # if form.is_valid():
+            #     instance = form.save()
+            #     print("save object successful!")
+            return redirect('upload_audio_success')
+            # newobj = SimpleAudioFile()
 
 
-class ScriptEditorView(View):
+class ScriptEditorView(LoginRequiredMixin, View):
     def get(self, request, pk, *args, **kwargs):
+        """ """
         script = Script.objects.get(pk=pk)
         context = {
             'script': script,
@@ -197,3 +225,8 @@ class AnalysisObjView(LoginRequiredMixin, View):
 
         return render(request, 'analysis_detail.html', context=context)
 
+
+class AudioUploadSuccessView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        context = {}
+        return render(request, 'uploaded_audio.html', context=context)

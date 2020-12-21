@@ -125,7 +125,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+MEDIA_URL = '/audio/'
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+MEDIA_ROOT = os.path.join(BASE_DIR, '/lessons/media/')
 
 LOGIN_REDIRECT_URL = '/lessons/'
 

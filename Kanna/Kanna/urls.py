@@ -28,5 +28,9 @@ urlpatterns = [
     path('lessons/', include('lessons.urls')),
     path('', RedirectView.as_view(url='lessons/')),  # todo set homepage in own app
     path('accounts/', include('django.contrib.auth.urls')),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  # todo remove serving of static files on deploy
+]   # todo remove serving of static files on deploy
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 

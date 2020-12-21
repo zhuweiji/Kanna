@@ -24,10 +24,11 @@
         position: relative;
         left: 30%;
     }
+
 </style>
 {% endblock %}
 {% block content %}
-
+{% csrf_token %}
 <br>
 <br>
 <br>
@@ -47,11 +48,13 @@
                             <br> File formats: wav, mp3</p>
                         <br>
                         <input type="file" accept="audio/*" capture id="upload_audio_button">
+                        <!--                        todo change the above accepted audio formats to ___ -->
                         <br>
                         <br>
                         <audio id="uploaded_audio_player" controls></audio>
+                        <!--                          todo restrict audio format and only allow audio files-->
 
-                        {#  todo restrict audio format and only allow audio files#}
+
                     </div>
                 </div>
             </div>
@@ -94,18 +97,18 @@
 <div class="row d-flex ">
     <div class="col-lg-4 col-sm-2 upload-shift-right">
         <button href="{% url 'analyse' %}" id="upload_file_button" class="btn btn-primary btn-lg">Upload file
-        {# todo redirect to error message if upload failure #}
-        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-bar-up" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" d="M8 10a.5.5 0 0 0 .5-.5V3.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 3.707V9.5a.5.5 0 0 0 .5.5zm-7 2.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"></path>
-        </svg></button>
+            {# todo redirect to error message if upload failure #}
+            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-bar-up" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M8 10a.5.5 0 0 0 .5-.5V3.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 3.707V9.5a.5.5 0 0 0 .5.5zm-7 2.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"></path>
+            </svg></button>
     </div>
 
     <div class="col-lg-4 col-sm-2 upload-shift-right">
         <button href="{% url 'analyse' %}" id="upload_voice_button" class="btn btn-primary btn-lg">Upload recording
-        {# todo redirect to error message if upload failure #}
-        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-bar-up" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" d="M8 10a.5.5 0 0 0 .5-.5V3.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 3.707V9.5a.5.5 0 0 0 .5.5zm-7 2.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"></path>
-        </svg></button>
+            {# todo redirect to error message if upload failure #}
+            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-bar-up" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M8 10a.5.5 0 0 0 .5-.5V3.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 3.707V9.5a.5.5 0 0 0 .5.5zm-7 2.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"></path>
+            </svg></button>
     </div>
 </div>
 
@@ -118,28 +121,42 @@
     // {#  players which play the audio #}
 
     $(document).ready(function(){
-        const upload_recorder = document.getElementById('upload_audio_button');
-        const upload_player = document.getElementById('uploaded_audio_player');
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
+        const upload_recorder = document.getElementById('upload_audio_button'); // button to upload user audio
+        const upload_player = document.getElementById('uploaded_audio_player'); // audio player to play ^ files
+
+        // group of three buttons to record, pause and stop+save recording
         const record_button = document.getElementById('record_button');
         const record_pause_button = document.getElementById('pause-button');
         const stop_record_button = document.getElementById('stop_record_button');
-        const recording_label = document.getElementById('recording_label');
-        const recording_player = document.getElementById('recording_player');
 
-        const upload_file = document.getElementById('upload_file_button');
-        const upload_voice = document.getElementById('upload_voice_button');
+        const recording_label = document.getElementById('recording_label'); // label for player below
+        const recording_player = document.getElementById('recording_player'); // audio player to play recorded audio
 
-        upload_file.disabled = true;
-        upload_voice.disabled = true;
+        const upload_file_to_server = document.getElementById('upload_file_button'); // upload broswer files to server button
+        const upload_voice_to_server = document.getElementById('upload_voice_button'); // upload recorded audio to server
 
+        // prevents upload to server until file is ready
+        upload_file_to_server.disabled = true;
+        upload_voice_to_server.disabled = true;
 
+        let fileURLToBeUploaded;
+        let audiofilename;
+        let data = new FormData();
+
+        // user uploads audio file to browser
         upload_recorder.addEventListener('change', function(e) {
             const upload_file = upload_recorder.files[0];
             const upload_URL = URL.createObjectURL(upload_file);
             upload_player.src = upload_URL;
+
+            fileURLToBeUploaded = upload_URL;
+            upload_file_to_server.disabled = false;
         });
 
+        // handler for audio recorder implemented below -- user can start recording, pause recording,
+        // and stop recording audio
         const captureAudio = function(stream){
             const mediaRecorder = new MediaRecorder(stream);
             let chunks = [];
@@ -148,6 +165,7 @@
                 chunks.push(e.data);
             }
 
+            // start/resume recording button
             record_button.onclick = function(){
                 if (mediaRecorder.state === 'inactive'){
                     mediaRecorder.start();
@@ -160,6 +178,7 @@
                 recording_label.innerText = 'Recording has started'
             }
 
+            // pause recording
             record_pause_button.onclick = function(){
                 mediaRecorder.pause();
                 console.log(mediaRecorder.state);
@@ -167,12 +186,14 @@
                 recording_label.innerText = 'Recording is paused.'
             }
 
+            // stop recording and save file to browser
             stop_record_button.onclick = function(){
                 mediaRecorder.stop();
                 chunks = [];
                 console.log('recording stopped');
                 record_button.style.background = '';
                 recording_label.innerText = 'Recording has been stopped.'
+                upload_voice_to_server.disabled = false;
             }
 
             mediaRecorder.onstop = function(e){
@@ -180,6 +201,7 @@
                 const recorded_URL = window.URL.createObjectURL(blob);
                 recording_player.src = recorded_URL;
 
+                fileURLToBeUploaded = recorded_URL;
             }
 
         }
@@ -189,8 +211,8 @@
             navigator.mediaDevices.getUserMedia({audio: true})
                 .then(captureAudio).catch(e => {
                 if (e.name==="NotFoundError"){
-                            document.getElementById('mic-permissions-warning').innerText = "We cannot detect a microphone" +
-                                " from your computer.\nPlease try again from another device."
+                    document.getElementById('mic-permissions-warning').innerText = "We cannot detect a microphone" +
+                        " from your computer.\nPlease try again from another device."
                     record_button.disabled = true;
                     stop_record_button.disabled = true;
                     recording_label.innerText = '';
@@ -213,8 +235,55 @@
                     }
                 );
         } else {
-            console.log('getUserMedia not supported on your browser!');
+            alert('getUserMedia not supported on your browser!');
         }
+        upload_file_to_server.addEventListener('click', ev => {
+            upload_file_to_server.disabled = true;
+            upload_file_to_server.innerText = 'saving...';
+
+            let newdata = new FormData();
+            let audiofile = new File([fileURLToBeUploaded], "audiofile")
+            newdata.append("audioURL", fileURLToBeUploaded);
+            newdata.append("audio", audiofile);
+            newdata.append("filename", audiofilename)
+
+            newdata.append('csrfmiddlewaretoken', csrftoken);
+
+            $.ajax({
+                    url: '',
+                    type: 'post',
+                    data: newdata,
+                    success: function (response) {
+                        alert('Success')
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                },
+            )
+        })
+        upload_voice_to_server.addEventListener('click', ev => {
+            //     data.append("audioRecording", fileToBeUploaded);
+            //
+            //     let url = "{% url 'upload_audio_success' %}";
+            //
+            //     let csrf = $('input[name="csrfmiddlewaretoken"]').val();
+            //     data.append('csrfmiddlewaretoken', csrf);
+            //
+            //     $.ajax({
+            //         url: url,
+            //         method: 'post',
+            //         data: data,
+            //         success: function(data){
+            //             if (data.success){
+            //
+            //             }
+            //             else{
+            //
+            //             }
+            //         }
+            //     })
+        })
 
     })
 
