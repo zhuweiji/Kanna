@@ -78,6 +78,7 @@ class Transcript(models.Model):
 
 
 class SimpleAudioFile(models.Model):
+    topic = models.CharField(max_length=100)
     audio = models.FileField(upload_to='audio/')
 
 class CustomUser(AbstractUser):

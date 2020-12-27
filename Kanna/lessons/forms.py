@@ -33,9 +33,6 @@ class ScriptCreateForm(forms.ModelForm):
 
 
 class SimpleAudioForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     class Meta:
         model = SimpleAudioFile
-        fields = ("__all__")
+        fields = ("topic", "audio")

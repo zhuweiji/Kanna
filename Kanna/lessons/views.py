@@ -28,6 +28,7 @@ def index(request):
 class ScriptListView(LoginRequiredMixin, generic.ListView):
     model = Script
     template_name = 'script_list.html'
+
     # paginate_by = 10
 
     def get_context_data(self, **kwargs):
@@ -68,37 +69,34 @@ class CreateScriptView(LoginRequiredMixin, CreateView):
 
 class RecordView(LoginRequiredMixin, View):
     def get(self, request):
-        context = {
+        form = SimpleAudioForm()
 
+        context = {
+            'form': form,
         }
         return render(request, 'record.html', context=context)
 
     def post(self, request):
-        if request.is_ajax():
-            """ save recorded audio blob or uploaded audio by user """
-            audio_file = request.POST.get("audio")
-
+        """ save recorded audio blob or uploaded audio by user """
+        if request.method == "POST":
             form = SimpleAudioForm(request.POST, request.FILES)
+            print(form.errors)
+            context = {}
             if form.is_valid():
-                print('here')
                 form.save()
-                return redirect('index')
+                return redirect('upload_audio_success')
+            else:
+                form = SimpleAudioForm()
+            return redirect('record.html')
 
-            # print(0)
-            # obj = SimpleAudioFile()
-            # print(1)
-            # obj.audio = request.POST.get("audio")
-            # print(2)
-            # obj.save()
-            # print(3)
 
-            # form = SimpleAudioForm(request.POST)
-            # print(form)
-            # if form.is_valid():
-            #     instance = form.save()
-            #     print("save object successful!")
-            return redirect('upload_audio_success')
-            # newobj = SimpleAudioFile()
+class AudioUploadSuccessView(LoginRequiredMixin, View):
+    def get(self, request, pk, *args, **kwargs):
+        instance = SimpleAudioFile.objects.get(pk=pk)
+        context = {
+
+        }
+        return render(request, 'uploaded_audio.html', context=context)
 
 
 class ScriptEditorView(LoginRequiredMixin, View):
@@ -147,7 +145,7 @@ class ScriptEditorView(LoginRequiredMixin, View):
                 is_highlighted = False
 
             # print(word, script_flags[word_counter], word_counter)
-            word_counter += 1 if (word not in markers and word_counter < len(script_flags)-1) else 0
+            word_counter += 1 if (word not in markers and word_counter < len(script_flags) - 1) else 0
 
         if len(script.text.split()) != len(script_flags):
             print('\n\n\n\n--------------------')
@@ -161,6 +159,7 @@ class ScriptEditorView(LoginRequiredMixin, View):
 class AnalysisCreateView(LoginRequiredMixin, CreateView):
     template_name = 'analysis.html'
     form_class = AnalysisCreateForm
+
     # success_url = reverse_lazy('index')
 
     def get_form_kwargs(self):
@@ -168,7 +167,7 @@ class AnalysisCreateView(LoginRequiredMixin, CreateView):
         kwargs['request'] = self.request
         return kwargs
 
-    def form_valid(self,form):
+    def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
@@ -202,7 +201,7 @@ class AnalysisObjView(LoginRequiredMixin, View):
                 no_misses = False
 
             try:
-                if misses[misses_ptr+1] == '2':
+                if misses[misses_ptr + 1] == '2':
                     missed_words[i] = missed_words[i] + "<br>"
                     misses_ptr += 1
             except IndexError:
@@ -224,9 +223,3 @@ class AnalysisObjView(LoginRequiredMixin, View):
                 instance.save()
 
         return render(request, 'analysis_detail.html', context=context)
-
-
-class AudioUploadSuccessView(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
-        context = {}
-        return render(request, 'uploaded_audio.html', context=context)

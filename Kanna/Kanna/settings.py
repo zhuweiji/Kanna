@@ -25,7 +25,7 @@ SECRET_KEY = '9u#5kosdk*v=lvo%b12-15db8kb(u%&!h4r=g%9491#g(yhx^l'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['zhuweiji.pythonanywhere.com']
+ALLOWED_HOSTS = ['zhuweiji.pythonanywhere.com','127.0.0.1']
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'lessons')
