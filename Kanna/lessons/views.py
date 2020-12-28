@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views import generic, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView, CreateView, FormView
+from django.views.generic import TemplateView, CreateView, FormView, DetailView
 from django.shortcuts import render
 from django import template
 from django.http import HttpResponseRedirect, JsonResponse
@@ -10,6 +10,9 @@ from django.urls import reverse, reverse_lazy
 from .models import *
 from .forms import *
 from .services import listify
+from .speech_transcription_request import transcribe_file
+import os
+import io
 
 from .forms import *
 
@@ -38,7 +41,7 @@ class ScriptListView(LoginRequiredMixin, generic.ListView):
         return context
 
 
-class ScriptDetailView(LoginRequiredMixin, generic.DetailView):
+class ScriptDetailView(LoginRequiredMixin, DetailView):
     model = Script
     template_name = 'script_detail.html'
 
@@ -54,7 +57,7 @@ class TranscriptListView(LoginRequiredMixin, generic.ListView):
     template_name = 'transcript_list.html'
 
 
-class TranscriptDetailView(LoginRequiredMixin, generic.DetailView):
+class TranscriptDetailView(LoginRequiredMixin, DetailView):
     model = Transcript
     template_name = 'transcript_detail.html'
 
@@ -80,23 +83,48 @@ class RecordView(LoginRequiredMixin, View):
         """ save recorded audio blob or uploaded audio by user """
         if request.method == "POST":
             form = SimpleAudioForm(request.POST, request.FILES)
-            print(form.errors)
             context = {}
             if form.is_valid():
-                form.save()
-                return redirect('upload_audio_success')
+                # newobj = form.save()
+                newobj = form.save()
+                audio_filepath = os.path.join(settings.MEDIA_ROOT, newobj.audio.name)
+                try:
+                    text = transcribe_file(audio_filepath)
+                    newobj.text = text
+
+                except Exception as e:
+                    raise e
+
+                newobj.save()
+
+                return redirect(newobj)
             else:
                 form = SimpleAudioForm()
             return redirect('record.html')
 
 
 class AudioUploadSuccessView(LoginRequiredMixin, View):
-    def get(self, request, pk, *args, **kwargs):
-        instance = SimpleAudioFile.objects.get(pk=pk)
-        context = {
+    # model = SimpleAudioFile
+    # template_name = 'simpleaudiofile_detail.html'
 
+    def get(self, request, pk, *args, **kwags):
+        audioobj = SimpleAudioFile.objects.get(pk=pk)
+
+        context = {
+            'audioobj': audioobj
         }
-        return render(request, 'uploaded_audio.html', context=context)
+
+        if request.is_ajax():
+            ajax_function = request.GET.get('method')
+            if ajax_function == 'transcribe':
+                # audio relative filepath is saved as field named 'audio'
+                audio_filepath = os.path.join(settings.MEDIA_ROOT, audioobj.audio.name)
+
+                text = transcribe_file(audio_filepath)
+                audioobj.text = text
+                audioobj.save()
+
+        return render(request, 'simpleaudiofile_detail.html', context=context)
 
 
 class ScriptEditorView(LoginRequiredMixin, View):

@@ -1,0 +1,56 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+
+{% block title %} <title>Uploaded Audio</title> {% endblock %}
+
+{% block head %}
+<style>
+    body{
+        background-image: url("{% static "image2.png" %}");
+        background-size: cover;
+        height: 130vh;
+        color: #333333;
+    }
+    .centered{
+        margin: 0 auto;
+    }
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="container centered">
+    <br>
+    <br>
+    <br>
+    <br>
+    <h1> uploaded file name: {{audioobj.audio}}</h1>
+    <p> text: {{audioobj.text}}</p>
+
+    <button id="retranscribe-button" type="button" class="btn btn-dark">Redo Transcribe</button>
+    <button id="edit-transcription" type="button" class="btn btn-secondary">Edit transcription</button>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <button type="button" class="btn btn-primary">Done</button>
+
+    <script>
+        $(document).ready(function(){
+            const retranscribe_btn = document.getElementById('retranscribe-button')
+            const edit_transcription_btn = document.getElementById('edit-transcription')
+
+            $("#retranscribe-button").click(function(){
+                $.ajax({
+                    url: '',
+                    type: 'get',
+                    data:{
+                        method: 'transcribe'
+                    }
+                })
+            })
+        })
+    </script>
+</div>
+{% endblock %}

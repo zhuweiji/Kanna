@@ -21,7 +21,8 @@ def listify(arr):
 if __name__ == '__main__':
     from pydub import AudioSegment
 
-    file_dir = r'C:\Users\zhuwe\OneDrive\Desktop\idea ink voice recordings'
+    # file_dir = r'C:\Users\zhuwe\OneDrive\Desktop\idea ink voice recordings'
+    file_dir = r'C:\Users\zhuwe\OneDrive\Documents\Sound recordings'
     formats_to_convert = ['.m4a']
     two_minutes = 120000
     unprocessed_dir = os.path.join(file_dir, 'unprocessed')
