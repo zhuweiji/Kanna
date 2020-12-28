@@ -81,6 +81,7 @@ class SimpleAudioFile(models.Model):
     topic = models.CharField(max_length=100)
     audio = models.FileField(upload_to='audio/')
     text = models.TextField(null=True)
+    original_transcription = models.TextField(null=True)
 
     def get_absolute_url(self):
         return reverse('upload_audio_success', args=[str(self.pk)])

@@ -4,53 +4,100 @@
 {% block title %} <title>Uploaded Audio</title> {% endblock %}
 
 {% block head %}
-<style>
-    body{
-        background-image: url("{% static "image2.png" %}");
-        background-size: cover;
-        height: 130vh;
-        color: #333333;
-    }
-    .centered{
-        margin: 0 auto;
-    }
-</style>
+    <style>
+        body{
+            background-image: url("{% static "image2.png" %}");
+            background-size: cover;
+            height: 130vh;
+            color: #333333;
+        }
+        .centered{
+            margin: 0 auto;
+        }
+
+        #text-editor{
+            width: 500px;
+            background: #212529;
+            padding: 2em;
+            color: whitesmoke;
+        }
+
+        #back-btn{
+            margin-left: 5em;
+            width: 6em;
+        }
+
+        #transcript-editor-border{
+            padding: 3em;
+        }
+    </style>
 {% endblock %}
 {% block content %}
+    <br>
+    <br>
+    <button type="button" class="btn btn-primary" id="back-btn">Back</button>
+    <div class="container centered">
+        <br>
+        <br>
+        <br>
+        <br>
+        <h1> uploaded file name: {{audioobj.audio}}</h1>
+        <p> text: {{audioobj.text}}</p>
 
-<div class="container centered">
-    <br>
-    <br>
-    <br>
-    <br>
-    <h1> uploaded file name: {{audioobj.audio}}</h1>
-    <p> text: {{audioobj.text}}</p>
+        <button id="retranscribe-button" type="button" class="btn btn-dark">Redo Transcribe</button>
+        <button id="edit-transcription" type="button" class="btn btn-secondary">Edit transcription</button>
+        <br>
+        <br>
+        <br>
 
-    <button id="retranscribe-button" type="button" class="btn btn-dark">Redo Transcribe</button>
-    <button id="edit-transcription" type="button" class="btn btn-secondary">Edit transcription</button>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <button type="button" class="btn btn-primary">Done</button>
+        {#    <div id="transcript-editor-border" class="d-flex justify-content-center text-center">#}
+        <div id="editor-area">
+            <h3>Edited text:</h3>
+            <label>
+            <textarea id="text-editor" cols="30" rows="10">{{ audioobj.text }}</textarea>
+        </label>
+        <button type="button" id="submit-edited-transcript" class="btn btn-primary">Save edited text</button>
+        </div>
 
-    <script>
-        $(document).ready(function(){
-            const retranscribe_btn = document.getElementById('retranscribe-button')
-            const edit_transcription_btn = document.getElementById('edit-transcription')
+        {#    </div>#}
+        <br>
+        <br>
+        <br>
 
-            $("#retranscribe-button").click(function(){
-                $.ajax({
-                    url: '',
-                    type: 'get',
-                    data:{
-                        method: 'transcribe'
-                    }
+
+        <script>
+            const editor_area = document.getElementById('editor-area')
+            editor_area.style.display = 'none';
+            $(document).ready(function(){
+                const edit_transcription_btn = document.getElementById('edit-transcription')
+
+                $("#edit-transcription").click(function(){
+                    console.log("i am called!")
+                    editor_area.style.display = 'block';
+                })
+
+                $("#retranscribe-button").click(function(){
+                    $.ajax({
+                        url: '',
+                        type: 'get',
+                        data:{
+                            method: 'transcribe'
+                        }
+                    })
+                })
+
+                $("#submit-edited-transcript").click(function(){
+                    console.log("i am being called!")
+                    $.ajax({
+                        url: '',
+                        type: 'get',
+                        data:{
+                            method: 'save',
+                            text: document.getElementById('text-editor').value
+                        }
+                    }).success(location.reload())
                 })
             })
-        })
-    </script>
-</div>
+        </script>
+    </div>
 {% endblock %}

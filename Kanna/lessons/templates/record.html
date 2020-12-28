@@ -42,7 +42,7 @@
                         <svg width="12em" height="15em" viewBox="0 0 16 16" class="bi bi-cloud-arrow-up-fill icon-shift-right" fill="currentColor " xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2zm2.354 5.146l-2-2a.5.5 0 0 0-.708 0l-2 2a.5.5 0 1 0 .708.708L7.5 6.707V10.5a.5.5 0 0 0 1 0V6.707l1.146 1.147a.5.5 0 0 0 .708-.708z"></path>
                         </svg>
-                        <div class="card-body">
+                        <div id='upload_file_cardbody' class="card-body">
                             <h5 class="card-title">Upload voice file</h5>
                             <p class="card-text">Upload a pre-recorded voice recording of your lesson from your computer
                                 <br> File formats: wav, mp3</p>
@@ -50,11 +50,11 @@
                             <form method="post" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 {{ form.as_p }}
-{#                                <label>#}
-{#                                    <input type="text" name="topic"> Topic#}
-{#                                </label>#}
-{#                                <input type="file" accept="audio/*" capture id="upload_audio_button" name="audiofile">#}
-{#                                <!--                        todo change the above accepted audio formats to ___ -->#}
+                                {#                                <label>#}
+                                {#                                    <input type="text" name="topic"> Topic#}
+                                {#                                </label>#}
+                                {#                                <input type="file" accept="audio/*" capture id="upload_audio_button" name="audiofile">#}
+                                {#                                <!--                        todo change the above accepted audio formats to ___ -->#}
 
                                 <audio id="uploaded_audio_player" controls></audio>
                                 <!--                          todo restrict audio format and only allow audio files-->
@@ -64,11 +64,27 @@
                                         <path fill-rule="evenodd" d="M8 10a.5.5 0 0 0 .5-.5V3.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 3.707V9.5a.5.5 0 0 0 .5.5zm-7 2.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"></path>
                                     </svg></button>
                             </form>
+                            <div id="loading_icon">
+                                <br>
 
+                                <p> Running transcription...</p>
+                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; background: none; display: block; shape-rendering: auto;" width="44px" height="44px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+                                    <rect x="17.5" y="30" width="15" height="40" fill="#337ab7">
+                                        <animate attributeName="y" repeatCount="indefinite" dur="1s" calcMode="spline" keyTimes="0;0.5;1" values="18;30;30" keySplines="0 0.5 0.5 1;0 0.5 0.5 1" begin="-0.2s"></animate>
+                                        <animate attributeName="height" repeatCount="indefinite" dur="1s" calcMode="spline" keyTimes="0;0.5;1" values="64;40;40" keySplines="0 0.5 0.5 1;0 0.5 0.5 1" begin="-0.2s"></animate>
+                                    </rect>
+                                    <rect x="42.5" y="30" width="15" height="40" fill="#5bc0de">
+                                        <animate attributeName="y" repeatCount="indefinite" dur="1s" calcMode="spline" keyTimes="0;0.5;1" values="20.999999999999996;30;30" keySplines="0 0.5 0.5 1;0 0.5 0.5 1" begin="-0.1s"></animate>
+                                        <animate attributeName="height" repeatCount="indefinite" dur="1s" calcMode="spline" keyTimes="0;0.5;1" values="58.00000000000001;40;40" keySplines="0 0.5 0.5 1;0 0.5 0.5 1" begin="-0.1s"></animate>
+                                    </rect>
+                                    <rect x="67.5" y="30" width="15" height="40" fill="#5cb85c">
+                                        <animate attributeName="y" repeatCount="indefinite" dur="1s" calcMode="spline" keyTimes="0;0.5;1" values="20.999999999999996;30;30" keySplines="0 0.5 0.5 1;0 0.5 0.5 1"></animate>
+                                        <animate attributeName="height" repeatCount="indefinite" dur="1s" calcMode="spline" keyTimes="0;0.5;1" values="58.00000000000001;40;40" keySplines="0 0.5 0.5 1;0 0.5 0.5 1"></animate>
+                                    </rect>
+                                    <!-- [ldio] generated by https://loading.io/ --></svg>
+                            </div>
                             <br>
                             <br>
-
-
 
                         </div>
                     </div>
@@ -97,15 +113,17 @@
                                     </svg>
                                 </button>
                                 <button id='stop_record_button' type="button" class="btn btn-outline-danger">Stop recording</button>
-                                <button href="{% url 'analyse' %}" id="upload_voice_button" class="btn btn-primary btn-lg">Upload recording
-                                    {# todo redirect to error message if upload failure #}
-                                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-bar-up" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd" d="M8 10a.5.5 0 0 0 .5-.5V3.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 3.707V9.5a.5.5 0 0 0 .5.5zm-7 2.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"></path>
-                                    </svg></button>
                             </div>
+
 
                             <label id="recording_label"> Recording not started </label>
                             <audio id="recording_player" controls></audio>
+
+                            <button href="{% url 'analyse' %}" id="upload_voice_button" class="btn btn-primary btn-lg">Upload recording
+                                {# todo redirect to error message if upload failure #}
+                                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-bar-up" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M8 10a.5.5 0 0 0 .5-.5V3.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 3.707V9.5a.5.5 0 0 0 .5.5zm-7 2.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"></path>
+                                </svg></button>
                         </div>
                     </div>
                 </div>
@@ -129,6 +147,8 @@
     <script>
         // {# Page has two main functionalities -> recorders which take in audio files/ record audio and #}
         // {#  players which play the audio #}
+        const loading_icon = document.getElementById('loading_icon')
+        loading_icon.style.display = 'none';
 
         $(document).ready(function(){
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -272,6 +292,9 @@
             {#        },#}
             {#    )#}
             {# })#}
+            upload_file_to_server.addEventListener('click', ev => {
+                loading_icon.style.display = 'block';
+            })
             upload_voice_to_server.addEventListener('click', ev => {
                 //     data.append("audioRecording", fileToBeUploaded);
                 //

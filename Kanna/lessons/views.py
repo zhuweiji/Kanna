@@ -121,6 +121,13 @@ class AudioUploadSuccessView(LoginRequiredMixin, View):
                 audio_filepath = os.path.join(settings.MEDIA_ROOT, audioobj.audio.name)
 
                 text = transcribe_file(audio_filepath)
+                audioobj.original_transcription = text
+                audioobj.text = text
+                audioobj.save()
+
+            if ajax_function == 'save':
+                text = request.GET.get('text')
+                print(text)
                 audioobj.text = text
                 audioobj.save()
 
