@@ -95,6 +95,7 @@
             <h3>Select a script to compare against:</h3>
             {% for script in scripts %}
                 <a href="" id="{{ script.id }}" class="script-selector">{{ script.topic }}</a>
+                <br>
             {% endfor %}
             {% if not scripts %}
                 <p> There are no scripts available </p>
@@ -191,7 +192,7 @@
                             method: 'analyse',
                             script: this.id
                         }
-                    })
+                    }).success(alert({{ similarity }}))
                 })
             }, time_out_value);
 
