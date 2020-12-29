@@ -86,9 +86,14 @@ class RecordView(LoginRequiredMixin, View):
 
             if form.is_valid():
                 newobj = form.save()
-                audio_filepath = os.path.join(settings.MEDIA_ROOT, newobj.audio.name)
+                audio_filepath = os.path.join(settings.MEDIA_ROOT, newobj.filename.name)
+                # filename is relative path from media dir in lessons
+                # newobj.filename.name is true filename
+
+                print(newobj.filename)
                 try:
                     text = transcribe_file(audio_filepath)
+                    newobj.creator = request.user
                     newobj.original_transcription = text
                     newobj.text = text
 
@@ -112,16 +117,18 @@ class AudioUploadSuccessView(LoginRequiredMixin, View):
 
     def get(self, request, pk, *args, **kwags):
         audioobj = SimpleAudioFile.objects.get(pk=pk)
+        all_script_objs = Script.objects.all()
 
         context = {
-            'audioobj': audioobj
+            'audioobj': audioobj,
+            'scripts': all_script_objs,
         }
 
         if request.is_ajax():
             ajax_function = request.GET.get('method')
             if ajax_function == 'transcribe':
                 # audio relative filepath is saved as field named 'audio'
-                audio_filepath = os.path.join(settings.MEDIA_ROOT, audioobj.audio.name)
+                audio_filepath = os.path.join(settings.MEDIA_ROOT, audioobj.filename.name)
 
                 text = transcribe_file(audio_filepath)
                 audioobj.original_transcription = text
@@ -135,7 +142,15 @@ class AudioUploadSuccessView(LoginRequiredMixin, View):
                 audioobj.text = text
                 audioobj.save()
 
+            if ajax_function == 'analyse':
+                pass
+
         return render(request, 'simpleaudiofile_detail.html', context=context)
+
+
+class SimpleAudioFileListView(LoginRequiredMixin, generic.ListView):
+    model = SimpleAudioFile
+    template_name = 'simpleaudiofilelistview.html'
 
 
 class ScriptEditorView(LoginRequiredMixin, View):

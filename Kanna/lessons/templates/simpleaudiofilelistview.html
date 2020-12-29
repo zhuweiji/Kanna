@@ -1,0 +1,50 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+
+{% block title %} <title>Audio Transcripts</title> {% endblock %}
+{% block head %}
+    <style>
+        body{
+            background-image: url("{% static "image2.png" %}");
+            background-size: cover;
+            height: 130vh;
+            color: #333333;
+        }
+        #obj-border{
+            margin: 50px;
+            padding: 50px;
+            background: #2f2f2f;
+        }
+
+
+    </style>
+{% endblock %}
+{% block content %}
+    <!--{% if object_list %}-->
+
+        <div class="container">
+            <p></p>
+            <br>
+            <h1 class="lead" style="font-size: 1.25em;">Audio files you have uploaded:</h1>
+
+
+            <ul>
+                {% for obj in object_list %}
+                    <div id="obj-border" class="border border-white rounded">
+                        <a href="{{ obj.get_absolute_url }}">{{obj.filename.name}}</a>
+                        <p>{{obj.text|truncatewords:200}}</p>
+                        <p> {{ obj.creator }}</p>
+                        <p> {{ obj.date_created }}</p>
+                    </div>
+                    <br>
+                {% endfor %}
+            </ul>
+        </div>
+        <!--    {% else %}-->
+        <!--        <p> There are no scripts for this user.</p>-->
+        <!--    {% endif %}-->
+
+
+
+
+{% endblock %}

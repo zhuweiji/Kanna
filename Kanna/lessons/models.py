@@ -78,13 +78,18 @@ class Transcript(models.Model):
 
 
 class SimpleAudioFile(models.Model):
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     topic = models.CharField(max_length=100)
-    audio = models.FileField(upload_to='audio/')
+    filename = models.FileField(upload_to='audio/')  # todo maybe change filename to date uploaded?
+
     text = models.TextField(null=True)
     original_transcription = models.TextField(null=True)
 
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+
     def get_absolute_url(self):
         return reverse('upload_audio_success', args=[str(self.pk)])
+
 
 class CustomUser(AbstractUser):
     pass

@@ -13,6 +13,7 @@ urlpatterns = [
 
 
     path('uploadsuccess/<int:pk>', views.AudioUploadSuccessView.as_view(), name='upload_audio_success'),
+    path('audiolist', views.SimpleAudioFileListView.as_view(), name='audio_list_view'),
 
     # unused
     #   -----------------------------------------------------------------------------

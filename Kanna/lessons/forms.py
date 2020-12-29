@@ -35,4 +35,4 @@ class ScriptCreateForm(forms.ModelForm):
 class SimpleAudioForm(forms.ModelForm):
     class Meta:
         model = SimpleAudioFile
-        fields = ("topic", "audio")
+        fields = ("topic", "filename")

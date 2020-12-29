@@ -21,7 +21,7 @@
 
             <ul>
                 {% for transcript in transcript_list %}
-                        <div id="transcript-border" class="border border-danger rounded">
+                        <div id="transcript-border" class="border border-white rounded">
                             <a href="{{ transcript.get_absolute_url }}">{{transcript}}</a>
                             <p>{{transcript.text|truncatewords:200}}</p>
                         </div>
