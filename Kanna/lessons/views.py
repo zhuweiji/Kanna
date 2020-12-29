@@ -83,13 +83,13 @@ class RecordView(LoginRequiredMixin, View):
         """ save recorded audio blob or uploaded audio by user """
         if request.method == "POST":
             form = SimpleAudioForm(request.POST, request.FILES)
-            context = {}
+
             if form.is_valid():
-                # newobj = form.save()
                 newobj = form.save()
                 audio_filepath = os.path.join(settings.MEDIA_ROOT, newobj.audio.name)
                 try:
                     text = transcribe_file(audio_filepath)
+                    newobj.original_transcription = text
                     newobj.text = text
 
                 except Exception as e:
@@ -100,7 +100,10 @@ class RecordView(LoginRequiredMixin, View):
                 return redirect(newobj)
             else:
                 form = SimpleAudioForm()
-            return redirect('record.html')
+            context = {
+                'form': form,
+            }
+            return render(request, 'record.html', context=context)
 
 
 class AudioUploadSuccessView(LoginRequiredMixin, View):
@@ -123,6 +126,7 @@ class AudioUploadSuccessView(LoginRequiredMixin, View):
                 text = transcribe_file(audio_filepath)
                 audioobj.original_transcription = text
                 audioobj.text = text
+
                 audioobj.save()
 
             if ajax_function == 'save':
