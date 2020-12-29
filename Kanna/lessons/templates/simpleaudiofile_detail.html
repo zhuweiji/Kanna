@@ -91,15 +91,15 @@
         <br>
         <br>
 
-    <div id="all-scripts-box">
-    <h3>Select a script to compare against:</h3>
-        {% for script in scripts %}
-            <a href="" id="{{ script.id }}" class="script-selector">{{ script.topic }}</a>
-        {% endfor %}
-    {% if not scripts %}
-        <p> There are no scripts available </p>
-    {% endif %}
-    </div>
+        <div id="all-scripts-box">
+            <h3>Select a script to compare against:</h3>
+            {% for script in scripts %}
+                <a href="" id="{{ script.id }}" class="script-selector">{{ script.topic }}</a>
+            {% endfor %}
+            {% if not scripts %}
+                <p> There are no scripts available </p>
+            {% endif %}
+        </div>
 
 
         {#    <div id="transcript-editor-border" class="d-flex justify-content-center text-center">#}
@@ -135,7 +135,11 @@
                     window.history.back();
                 })
                 $("#edit-transcription").click(function(){
-                    editor_area.style.display = 'block';
+                    if (editor_area.style.display === 'none'){
+                        editor_area.style.display = 'block';
+                    }
+                    else if (editor_area.style.display === 'block')
+                        editor_area.style.display = 'none';
                 })
 
                 $("#retranscribe-button").click(function(){
@@ -154,26 +158,42 @@
                 })
 
 
-            $("#submit-edited-transcript").click(function(){
-                console.log("i am being called!")
-                $.ajax({
-                    url: '',
-                    type: 'get',
-                    data:{
-                        method: 'save',
-                        text: document.getElementById('text-editor').value
-                    }
-                }).success(location.reload())
-            })
+                $("#submit-edited-transcript").click(function(){
+                    $.ajax({
+                        url: '',
+                        type: 'get',
+                        data:{
+                            method: 'save',
+                            text: document.getElementById('text-editor').value
+                        }
+                    }).success(location.reload())
+                })
             })
 
             analyse_btn.addEventListener('click', function(){
+                let time_out_value = 500;
                 setTimeout(() => {
-                    scripts_box.style.display = 'block';
-                    $("a.script-selector").click(function(){
-                        alert(this.id)
+                    {# set future "loading" times to 0 - after first time no loading performed #}
+                    time_out_value = 0;
+
+                    if (scripts_box.style.display === 'none'){
+                        scripts_box.style.display = 'block';
+                    }
+                    else if (scripts_box.style.display === 'block'){
+                        scripts_box.style.display = 'none';
+                    }
+
+                $("a.script-selector").click(function(){
+                       $.ajax({
+                        url: '',
+                        type: 'get',
+                        data:{
+                            method: 'analyse',
+                            script: this.id
+                        }
                     })
-                }, 500);
+                })
+            }, time_out_value);
 
 
             })

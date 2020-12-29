@@ -11,6 +11,7 @@ from .models import *
 from .forms import *
 from .services import listify
 from .speech_transcription_request import transcribe_file
+from difflib import SequenceMatcher
 import os
 import io
 
@@ -143,7 +144,20 @@ class AudioUploadSuccessView(LoginRequiredMixin, View):
                 audioobj.save()
 
             if ajax_function == 'analyse':
-                pass
+                print(audioobj.text)
+                script_id = request.GET.get('script')
+
+                script = Script.objects.get(pk=script_id)
+                print(script.text)
+
+                def similar(a, b):
+                    """ placeholder similarity comparison"""
+                    return SequenceMatcher(None, a, b).ratio()
+
+                similarity = similar(audioobj.text, script.text)
+                context['similarity'] = similarity
+                print(similarity)
+                # todo implement view to see changes
 
         return render(request, 'simpleaudiofile_detail.html', context=context)
 
