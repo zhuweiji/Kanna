@@ -15,6 +15,7 @@ urlpatterns = [
     path('uploadsuccess/<int:pk>', views.AudioUploadSuccessView.as_view(), name='upload_audio_success'),
     path('audiolist', views.SimpleAudioFileListView.as_view(), name='audio_list_view'),
 
+
     # unused
     #   -----------------------------------------------------------------------------
     path('transcript', views.TranscriptListView.as_view(), name='transcript_list'),
@@ -23,4 +24,5 @@ urlpatterns = [
     path('start_new_analysis', views.AnalysisCreateView.as_view(), name='analyse'),
     path('analyse', views.AnalysisListView.as_view(), name='analyse_list'),
     path('analyse/<int:pk>', views.AnalysisObjView.as_view(), name='analyse_detail'),
+
 ]

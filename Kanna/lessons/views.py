@@ -125,6 +125,14 @@ class AudioUploadSuccessView(LoginRequiredMixin, View):
             'scripts': all_script_objs,
         }
 
+        similiarity = request.session.get('similarity', False)
+
+        print([i for i in request.session.items()])
+
+        if similiarity:
+            del(request.session['similarity'])
+            context['similarity'] = similiarity
+
         if request.is_ajax():
             ajax_function = request.GET.get('method')
             if ajax_function == 'transcribe':
@@ -137,13 +145,17 @@ class AudioUploadSuccessView(LoginRequiredMixin, View):
 
                 audioobj.save()
 
-            if ajax_function == 'save':
+                return render(request, 'simpleaudiofile_detail.html', context=context)
+
+            elif ajax_function == 'save':
                 text = request.GET.get('text')
                 print(text)
                 audioobj.text = text
                 audioobj.save()
 
-            if ajax_function == 'analyse':
+                return render(request, 'simpleaudiofile_detail.html', context=context)
+
+            elif ajax_function == 'analyse':
                 print(audioobj.text)
                 script_id = request.GET.get('script')
 
@@ -155,11 +167,27 @@ class AudioUploadSuccessView(LoginRequiredMixin, View):
                     return SequenceMatcher(None, a, b).ratio()
 
                 similarity = similar(audioobj.text, script.text)
-                context['similarity'] = similarity
-                print(similarity)
+                request.session['similarity'] = similarity
+
+
                 # todo implement view to see changes
 
-        return render(request, 'simpleaudiofile_detail.html', context=context)
+                return render(request, 'simpleaudiofile_detail.html', context=context)
+
+        else:
+            if similiarity:
+                print(similiarity)
+            else:
+                print('similarity not present')
+            return render(request, 'simpleaudiofile_detail.html', context=context)
+
+
+class CompletedAnalysisView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        context = {
+            # 'similarity': request.session['similarity'],
+        }
+        return render(request, '(deprec)completed_analysis.html', context=context)
 
 
 class SimpleAudioFileListView(LoginRequiredMixin, generic.ListView):

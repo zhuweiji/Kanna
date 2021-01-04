@@ -50,6 +50,18 @@
     <br>
     <br>
     <button type="button" class="btn btn-primary" id="back-btn">Back</button>
+
+{#    report page shown if analysis has been performed #}
+    {% if similarity %}
+    <div class="container centered">
+        <div id="text-display">
+            <h1>Report</h1>
+            <p>Similarity index: {{ similarity }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+
     <div class="container centered">
         <br>
         <br>
@@ -191,8 +203,11 @@
                         data:{
                             method: 'analyse',
                             script: this.id
-                        }
-                    }).success(alert({{ similarity }}))
+                        },
+                           success: (function(data){
+                               location.reload();
+                           })
+                    })
                 })
             }, time_out_value);
 
