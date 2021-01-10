@@ -9,8 +9,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse, reverse_lazy
 from .models import *
 from .forms import *
-from .services import listify
-from .speech_transcription_request import transcribe_file
+from .services import listify, google_transcribe
 from difflib import SequenceMatcher
 import os
 import io
@@ -93,7 +92,7 @@ class RecordView(LoginRequiredMixin, View):
 
                 print(newobj.filename)
                 try:
-                    text = transcribe_file(audio_filepath)
+                    text = google_transcribe(audio_filepath)
                     newobj.creator = request.user
                     newobj.original_transcription = text
                     newobj.text = text
@@ -139,7 +138,7 @@ class AudioUploadSuccessView(LoginRequiredMixin, View):
                 # audio relative filepath is saved as field named 'audio'
                 audio_filepath = os.path.join(settings.MEDIA_ROOT, audioobj.filename.name)
 
-                text = transcribe_file(audio_filepath)
+                text = google_transcribe(audio_filepath)
                 audioobj.original_transcription = text
                 audioobj.text = text
 

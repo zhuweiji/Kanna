@@ -3,9 +3,11 @@ import os
 
 #   for a credentials json file in the same dir as this .py file
 credential_path = os.path.join(os.getcwd(), 'booming-skill-282713-ebdebd62f7e3.json')
+
 #   running manage.py means that cwd is one level above credentials file
 if not os.path.isfile(credential_path): credential_path = os.path.join(os.getcwd(), 'lessons', 'booming-skill-282713-ebdebd62f7e3.json')
 if not os.path.isfile(credential_path): credential_path = r'/home/zhuweiji/Kanna/Kanna/lessons/booming-skill-282713-ebdebd62f7e3.json'
+
 #   saves json credentials to local env variable
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
 
@@ -96,10 +98,22 @@ if __name__ == '__main__':
     print(__file__ + " is running as main")
     print(credential_path)
     print(os.path.isfile(credential_path))
-    foo = r'/home/zhuweiji/Kanna/Kanna/lessons/media/audio/Recording_4part1.wav'
-    print(os.path.isfile(foo))
-    val = transcribe_file(foo)
-    print(val)
+
+    # local transcribe test
+    # folder = r'C:\Users\zhuwe\OneDrive\Desktop\audio_files'
+    folder = r'C:\Users\zhuwe\Downloads'
+    filename = r'WhatsApp Audio 2020-12-17 at 13.33.42.wav'
+    file = os.path.join(folder, filename)
+    print(file)
+    assert os.path.isfile(file)
+
+    print(transcribe_file(file))
+
+    # serverside transcribe test
+    # foo = r'/home/zhuweiji/Kanna/Kanna/lessons/media/audio/Recording_4part1.wav'
+    # print(os.path.isfile(foo))
+    # val = transcribe_file(foo)
+    # print(val)
     # filename = r'Recording (4)part1.wav'
     # # filepath = os.path.join(r'C:\lessons\media\audio', filename)
     # filepath = os.path.join(r'C:\Users\zhuwe\OneDrive\Documents\Sound recordings\processed', filename)
