@@ -86,7 +86,7 @@ def google_transcribe(filepath):
     print('uploading audio to cloud')
     upload_blob(bucket_name, source_file_name, destination_blob_name)
 
-    gcs_uri = 'gs://' + bucketname + '/' + source_file_name
+    gcs_uri = 'gs://' + bucketname + '/' + destination_blob_name
     transcript = ''
 
     client = speech.SpeechClient()
@@ -128,7 +128,7 @@ def listify(arr):
 
 
 if __name__ == '__main__':
-    print(os.path.basename(r'C:\Users\zhuwe\OneDrive\Desktop\audio_files\unprocessed\matthew.wav'))
+    print(google_transcribe(r'C:\Users\zhuwe\OneDrive\Desktop\audio_files\unprocessed\matthew.wav'))
 
     if False:
         from pydub import AudioSegment
