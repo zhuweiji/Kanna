@@ -73,7 +73,7 @@
                     <div class="card-body">
                         <h5 class="card-title">View your history</h5>
                         <p class="card-text">Check your past lessons and view past reports</p>
-                        <a href="{% url 'analyse' %}" class="btn btn-outline-info">Analyse</a>
+                        <button disabled href="{% url 'audio_list_view' %}" class="btn btn-outline-info">Analyse</button>
                     </div>
                 </div>
             </div>
@@ -81,7 +81,7 @@
                 <div class="card text-white bg-dark mb-3">
                     <div class="card-body">
                         <h5 class="card-title">Record a new lesson</h5>
-                        <p class="card-text">Start recording a new trial lesson to evaluate against created lessons</p>
+                        <p class="card-text">Start recording a new trial lesson to evaluate</p>
                         <a href="{% url 'record' %}" class="btn btn-outline-info">Start recording</a>
                     </div>
                 </div>
