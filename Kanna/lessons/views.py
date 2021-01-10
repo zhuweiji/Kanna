@@ -168,7 +168,6 @@ class AudioUploadSuccessView(LoginRequiredMixin, View):
                 similarity = similar(audioobj.text, script.text)
                 request.session['similarity'] = similarity
 
-
                 # todo implement view to see changes
 
                 return render(request, 'simpleaudiofile_detail.html', context=context)
