@@ -250,7 +250,7 @@ class ScriptEditorView(LoginRequiredMixin, View):
 
 
 class AnalysisCreateView(LoginRequiredMixin, CreateView):
-    template_name = 'analysis.html'
+    template_name = '(deprec)analysis.html'
     form_class = AnalysisCreateForm
 
     # success_url = reverse_lazy('index')
