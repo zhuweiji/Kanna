@@ -126,8 +126,6 @@ class AudioUploadSuccessView(LoginRequiredMixin, View):
 
         similiarity = request.session.get('similarity', False)
 
-        print([i for i in request.session.items()])
-
         if similiarity:
             del(request.session['similarity'])
             context['similarity'] = similiarity
@@ -191,6 +189,7 @@ class CompletedAnalysisView(LoginRequiredMixin, View):
 class SimpleAudioFileListView(LoginRequiredMixin, generic.ListView):
     model = SimpleAudioFile
     template_name = 'simpleaudiofilelistview.html'
+    ordering = ['-date_created']
 
 
 class ScriptEditorView(LoginRequiredMixin, View):
