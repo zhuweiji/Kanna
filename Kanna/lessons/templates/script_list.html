@@ -4,40 +4,53 @@
 {% block title %} <title>Lesson Analysis</title> {% endblock %}
 {% block head %}
     <style>
+        body{
+            background-image: url("{% static "image2.png" %}");
+            background-size: cover;
+            height: 130vh;
+            color: #333333;
+        }
         #script-border{
             margin: 50px;
             padding: 50px;
+            background: rgba(0, 0, 0, 0.8);
+
         }
     </style>
 {% endblock %}
 {% block content %}
-<!--{% if object_list %}-->
+    <!--{% if object_list %}-->
 
-<br>
-<br>
-<div class="container">
+        <br>
+        <br>
+        <div class="container">
 
-    <h1 class="lead" style="font-size: 1.25em;"> Model scripts you should follow</h1>
-    <div class="container">
+        <h1 class="lead" style="font-size: 1.25em;"> Model scripts you should follow</h1>
+        <div class="container">
 
-        <ul>
-            {% for script in script_list %}
-                    <div id="script-border" class="border border-danger rounded">
-                        <a href="{{ script.get_absolute_url }}">{{script}}</a>
+            <ul>
+                {% for script in script_list %}
+                    <div id="script-border" class="border border-dark rounded">
+                        {% if user.is_superuser %}
+                            <a href="{{ script.get_absolute_url }}">{{script}}</a>
+                        {% else %}
+                            <p> {{ script.topic }}</p>
+                        {% endif %}
+                        <br><br>
                         <p>{{script.text|truncatewords:100}}</p>
                     </div>
-                <br>
+                    <br>
 
 
 
-            {% endfor %}
-        </ul>
+                {% endfor %}
+            </ul>
+        </div>
+        <!--    {% else %}-->
+        <!--        <p> There are no scripts for this user.</p>-->
+        <!--    {% endif %}-->
+
     </div>
-<!--    {% else %}-->
-<!--        <p> There are no scripts for this user.</p>-->
-<!--    {% endif %}-->
-
-</div>
 
 
 

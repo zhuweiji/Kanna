@@ -2,21 +2,68 @@
 {% load static %}
 
 {% block title %} <title>Lesson Analysis</title> {% endblock %}
-
+{% block head %}
+    <style>
+        .highlighted{
+            color: pink;
+        }
+    </style>
+{% endblock %}
 {% block content %}
+    <br>
+    <br>
+    <br>
+    <div class="container">
+        <h2>Lesson: {{ script }}</h2>
 
-<br>
-<br>
-<br>
-<div class="container">
-    <h2>Lesson: {{ script }}</h2>
+        <p> {{script.text}} </p>
+        <p id="script-flags"></p>
 
-    <p> {{script.text}} </p>
+        <script>
+            let flags = "{{ script.flags|safe }}";
+            let container = document.getElementById('script-flags');
+            let words = "{{ script.text }}"
 
-    <p> {{ script.flags }}</p>
+            flags = flags.replace(/\D/g, "");
 
-    <button class="btn btn-primary">Analyse</button>
-</div>
+            console.log(words.split(" ").length)
+            console.log(flags.length)
+            if (flags.length !== words.split(" ").length){
+                console.log("warning: number of flags is not equal to number of words")
+            }
+
+            let highlighted = false;
+            count = 0;
+            for (let val of flags){
+                if (highlighted && val === '0'){
+                    highlighted = false;
+
+                    {#let highlightspan = document.createElement('span');#}
+                    {#highlightspan.setAttribute('class','highlighted');#}
+                    {#words[count] = "<span class="highlighted> "#}
+
+                    console.log(words[count])
+                    console.log("end")
+                }
+                if (val === '1' && !highlighted){
+                    highlighted = true;
+                    console.log(words[count])
+                    console.log("start")
+                }
+
+                count++;
+            }
+            container.innerHTML = flags;
+
+            function string_insert(str, index, value) {
+                return str.substr(0, index) + value + str.substr(index);
+            }
+
+        </script>
+
+
+        <a class="btn btn-primary" href={% url 'mark_keywords' pk=script.pk%}>Mark keywords</a>
+    </div>
 
 
 {% endblock %}
