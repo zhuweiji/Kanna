@@ -44,6 +44,12 @@
             color: darkblue;
             text-decoration: underline;
         }
+        hr{
+            border-top: 1px solid whitesmoke;
+        }
+        #text-display h5{
+            color: mediumvioletred;
+        }
     </style>
 {% endblock %}
 {% block content %}
@@ -56,9 +62,18 @@
         <div class="container centered">
             <div id="text-display">
                 <h1>Report</h1>
+                <hr>
+
+                <br>
+                <h5><i>Keywords</i></h5>
+                <p>Keyphrase score: {{ keyphrase_score }} / 2</p>
+                <br>
+
+                <h5><i>Overall heuristics</i></h5>
                 <p>Similarity index: {{ similarity }}</p>
                 <p>Keywords missed: {{ keywords_missed }}</p>
                 <p>Ratio of keywords hit: {{ keywords_hit_ratio }}</p>
+
 
             </div>
         </div>
@@ -83,6 +98,7 @@
         <button id="retranscribe-button" type="button" class="btn btn-dark">Redo Transcribe</button>
         <button id="edit-transcription" type="button" class="btn btn-secondary">Edit transcription</button>
         <button id="analyse-btn" type="button" class="btn btn-primary">Analyse Transcript</button>
+        <p id="user-reload-message"></p>
 
         <div id="loading_icon">
             <br>
@@ -199,6 +215,11 @@
                 }
 
                 $("a.script-selector").click(function(){
+                    let reload_label = document.getElementById("user-reload-message")
+
+                    reload_label.innerText = "Reload the page if the report is not displayed"
+                    reload_label.style.class = "alert alert-danger"
+
                     $.ajax({
                         url: '',
                         type: 'get',

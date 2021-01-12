@@ -18,6 +18,8 @@ import io
 from .forms import *
 from .report import ReportAnalyser
 
+
+
 @login_required
 def index(request):
     user = None
@@ -115,7 +117,7 @@ class AudioUploadSuccessView(LoginRequiredMixin, View):
     # model = SimpleAudioFile
     # template_name = 'simpleaudiofile_detail.html'
 
-    def get(self, request, pk, *args, **kwags):
+    def get(self, request, pk, *args, **kwargs):
         audioobj = SimpleAudioFile.objects.get(pk=pk)
         all_script_objs = Script.objects.all()
 
@@ -124,27 +126,26 @@ class AudioUploadSuccessView(LoginRequiredMixin, View):
             'scripts': all_script_objs,
         }
 
+        # session stores report data that is generated during ajax call defined at bottom
+        #   if report has been generated, report_present == True
         report_present = request.session.get('report', False)
-        print("Report present: ", report_present)
 
-        for key, value in list(request.session.items()):
-            if not key[0] == '_':
+        for key, value in list(request.session.items()):  # stores all session variables in context
+            if not key[0] == '_':  # exclude django default session values
                 context[key] = value
 
-            print(key, ':', value)
-
-        if report_present:
+        if report_present:  # delete all session variables after storing in context or it'll be saved in browser forever
             for key, value in list(request.session.items()):
                 if not key[0] == '_':
                     del(request.session[key])
 
         if request.is_ajax():
-            ajax_function = request.GET.get('method')
+            ajax_function = request.GET.get('method')  # purpose of ajax call is stored as 'method' in the ajax object
             if ajax_function == 'transcribe':
-                # audio relative filepath is saved as field named 'audio'
+                # audio relative filepath is saved as field "filename"
                 audio_filepath = os.path.join(settings.MEDIA_ROOT, audioobj.filename.name)
 
-                text = google_transcribe(audio_filepath)
+                text = google_transcribe(audio_filepath)  # API call to google speech to text
                 audioobj.original_transcription = text
                 audioobj.text = text
 
@@ -164,15 +165,16 @@ class AudioUploadSuccessView(LoginRequiredMixin, View):
                 script_id = request.GET.get('script')
                 script = Script.objects.get(pk=script_id)
 
-                script_text = script.get_cleaned_text()
+                script_text = script.text
 
+                # class might be replaced by model in the future
                 report = ReportAnalyser(script_text=script_text, script_flags=script.flags, audioobj_text=audioobj.text)
                 analyser_output = report.output
 
-                for key, value in analyser_output.items():
+                for key, value in analyser_output.items():  # store output in session
                     request.session[key] = value
 
-                request.session['report'] = True
+                request.session['report'] = True  # store variable indicating report has been generated
 
                 # todo implement view to see changes
 
