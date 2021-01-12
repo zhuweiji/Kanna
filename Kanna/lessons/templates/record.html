@@ -45,11 +45,26 @@
                         <div id='upload_file_cardbody' class="card-body">
                             <h5 class="card-title">Upload voice file</h5>
                             <p class="card-text">Upload a pre-recorded voice recording of your lesson from your computer
-                                <br> File formats: wav, mp3</p>
+                                <br> File formats: wav, m4a, mp3</p>
                             <br>
                             <form method="post" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 {{ form.as_p }}
+
+{#                                {% if form.errors %}#}
+{#                                    {% for field in form %}#}
+{#                                        {% for error in field.errors %}#}
+{#                                            <div class="alert alert-danger">#}
+{#                                                <strong>{{ error|escape }}</strong>#}
+{#                                            </div>#}
+{#                                        {% endfor %}#}
+{#                                    {% endfor %}#}
+{#                                    {% for error in form.non_field_errors %}#}
+{#                                        <div class="alert alert-danger">#}
+{#                                            <strong>{{ error|escape }}</strong>#}
+{#                                        </div>#}
+{#                                    {% endfor %}#}
+{#                                {% endif %}#}
 
                                 {#                                <label>#}
                                 {#                                    <input type="text" name="topic"> Topic#}

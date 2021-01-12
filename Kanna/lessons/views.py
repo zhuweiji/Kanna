@@ -12,10 +12,11 @@ from .forms import *
 from .services import listify, google_transcribe
 from difflib import SequenceMatcher
 import os
+import functools
 import io
 
 from .forms import *
-
+from .report import ReportAnalyser
 
 @login_required
 def index(request):
@@ -103,8 +104,7 @@ class RecordView(LoginRequiredMixin, View):
                 newobj.save()
 
                 return redirect(newobj)
-            else:
-                form = SimpleAudioForm()
+
             context = {
                 'form': form,
             }
@@ -124,11 +124,19 @@ class AudioUploadSuccessView(LoginRequiredMixin, View):
             'scripts': all_script_objs,
         }
 
-        similiarity = request.session.get('similarity', False)
+        report_present = request.session.get('report', False)
+        print("Report present: ", report_present)
 
-        if similiarity:
-            del(request.session['similarity'])
-            context['similarity'] = similiarity
+        for key, value in list(request.session.items()):
+            if not key[0] == '_':
+                context[key] = value
+
+            print(key, ':', value)
+
+        if report_present:
+            for key, value in list(request.session.items()):
+                if not key[0] == '_':
+                    del(request.session[key])
 
         if request.is_ajax():
             ajax_function = request.GET.get('method')
@@ -153,28 +161,24 @@ class AudioUploadSuccessView(LoginRequiredMixin, View):
                 return render(request, 'simpleaudiofile_detail.html', context=context)
 
             elif ajax_function == 'analyse':
-                print(audioobj.text)
                 script_id = request.GET.get('script')
-
                 script = Script.objects.get(pk=script_id)
-                print(script.text)
 
-                def similar(a, b):
-                    """ placeholder similarity comparison"""
-                    return SequenceMatcher(None, a, b).ratio()
+                script_text = script.get_cleaned_text()
 
-                similarity = similar(audioobj.text, script.text)
-                request.session['similarity'] = similarity
+                report = ReportAnalyser(script_text=script_text, script_flags=script.flags, audioobj_text=audioobj.text)
+                analyser_output = report.output
+
+                for key, value in analyser_output.items():
+                    request.session[key] = value
+
+                request.session['report'] = True
 
                 # todo implement view to see changes
 
                 return render(request, 'simpleaudiofile_detail.html', context=context)
 
         else:
-            if similiarity:
-                print(similiarity)
-            else:
-                print('similarity not present')
             return render(request, 'simpleaudiofile_detail.html', context=context)
 
 

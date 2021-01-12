@@ -36,3 +36,14 @@ class SimpleAudioForm(forms.ModelForm):
     class Meta:
         model = SimpleAudioFile
         fields = ("topic", "filename")
+
+    def clean(self):
+        """ checks that uploaded audio is of acceptable type """
+        accepted_extensions = ['m4a', 'wav', 'mp3']
+
+        cleaned_data = super().clean()
+        file = cleaned_data.get('filename')
+        file_extension = str(file).split('.')[1]
+
+        if file_extension.lower() not in accepted_extensions:
+            raise forms.ValidationError(f"Audio must be either {(','.join(accepted_extensions))}")

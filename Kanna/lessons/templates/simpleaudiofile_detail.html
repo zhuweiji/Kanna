@@ -51,15 +51,18 @@
     <br>
     <button type="button" class="btn btn-primary" id="back-btn">Back</button>
 
-{#    report page shown if analysis has been performed #}
-    {% if similarity %}
-    <div class="container centered">
-        <div id="text-display">
-            <h1>Report</h1>
-            <p>Similarity index: {{ similarity }}</p>
+    {#    report page shown if analysis has been performed #}
+    {% if report %}
+        <div class="container centered">
+            <div id="text-display">
+                <h1>Report</h1>
+                <p>Similarity index: {{ similarity }}</p>
+                <p>Keywords missed: {{ keywords_missed }}</p>
+                <p>Ratio of keywords hit: {{ keywords_hit_ratio }}</p>
+
+            </div>
         </div>
-    </div>
-        {% else %}
+    {% else %}
         <script> console.log("report not analysed")</script>
     {% endif %}
 
@@ -186,32 +189,29 @@
             })
 
             analyse_btn.addEventListener('click', function(){
-                let time_out_value = 500;
-                setTimeout(() => {
-                    {# set future "loading" times to 0 - after first time no loading performed #}
-                    time_out_value = 0;
 
-                    if (scripts_box.style.display === 'none'){
-                        scripts_box.style.display = 'block';
-                    }
-                    else if (scripts_box.style.display === 'block'){
-                        scripts_box.style.display = 'none';
-                    }
+
+                if (scripts_box.style.display === 'none'){
+                    scripts_box.style.display = 'block';
+                }
+                else if (scripts_box.style.display === 'block'){
+                    scripts_box.style.display = 'none';
+                }
 
                 $("a.script-selector").click(function(){
-                       $.ajax({
+                    $.ajax({
                         url: '',
                         type: 'get',
                         data:{
                             method: 'analyse',
                             script: this.id
                         },
-                           success: (function(data){
-                               location.reload();
-                           })
+                        success: (function(data){
+                            location.reload();
+                        })
                     })
                 })
-            }, time_out_value);
+
 
 
             })

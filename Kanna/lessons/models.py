@@ -43,7 +43,7 @@ class Script(models.Model):
     def get_cleaned_text(self):
         original_text = self.text
         # todo convert numbers into alphabets (1 -> one)
-        return re.sub(r"[^a-zA-Z' ]", ' ', original_text)
+        return re.sub(r"[^a-zA-Z' ]", '', original_text)
 
     def clean(self):
         # possibly unused
@@ -133,6 +133,7 @@ class AnalysisObj(models.Model):
             highlights_missed = self.highlights_missed.strip('][').split(', ')
         else:
             highlights_missed = self.highlights_missed
+
         print('highlight', highlight)
         print('highlights_missed:', highlights_missed)
         print(type(highlights_missed))
