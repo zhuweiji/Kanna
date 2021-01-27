@@ -14,6 +14,7 @@ from difflib import SequenceMatcher
 import os
 import functools
 import io
+from django.contrib.auth import login
 
 from .forms import *
 from .report import ReportAnalyser
@@ -33,6 +34,21 @@ def index(request):
         'user': user
     }
     return render(request, 'index.html', context=context)
+
+
+class TutorSignUpView(generic.CreateView):
+    model = CustomUser
+    form_class = TutorSignUpForm
+    template_name = 'tutor_sign_up.html'
+
+    def get_context_data(self, **kwargs):
+        kwargs['user_type'] = 'tutor'
+        return super().get_context_data(**kwargs)
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect('index')
 
 
 class TopicCreateView(LoginRequiredMixin, generic.CreateView):

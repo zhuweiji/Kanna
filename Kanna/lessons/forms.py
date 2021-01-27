@@ -1,6 +1,9 @@
 from django import forms
 from django.forms import ModelForm
+from django.contrib.auth.forms import UserCreationForm, get_user_model
 from .models import *
+
+User = get_user_model()
 
 
 class AnalysisCreateForm(forms.ModelForm):
@@ -24,6 +27,19 @@ class AnalysisCreateForm(forms.ModelForm):
     #         self.save_m2m()
     #         print('complete')
     #     return inst
+
+
+class TutorSignUpForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = User
+
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.is_tutor = True
+        if commit:
+            user.save()
+        return user
 
 
 class TopicCreateForm(forms.ModelForm):

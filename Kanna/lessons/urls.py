@@ -16,6 +16,8 @@ urlpatterns = [
     path('audiolist', views.SimpleAudioFileListView.as_view(), name='audio_list_view'),
 
     path('topic/create', views.TopicCreateView.as_view(), name='topic_create'),
+
+    path('signup/tutor', views.TutorSignUpView.as_view(),name='tutor_signup'),
     # unused
     #   -----------------------------------------------------------------------------
     path('transcript', views.TranscriptListView.as_view(), name='transcript_list'),

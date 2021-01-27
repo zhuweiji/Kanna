@@ -92,7 +92,9 @@ class SimpleAudioFile(models.Model):
 
 
 class CustomUser(AbstractUser):
-    pass
+    is_student = models.BooleanField(default=False)
+    is_tutor = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
 
 
 class AnalysisObj(models.Model):

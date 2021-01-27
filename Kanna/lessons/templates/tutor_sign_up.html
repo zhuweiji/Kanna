@@ -1,0 +1,49 @@
+{% extends "base_generic.html" %}
+{% load static %}
+
+{% block head %}
+    <style>
+        body{
+            background-image: url("{% static "image2.png" %}");
+            background-size: cover;
+        }
+        .field-wrapper{
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        #id_text{
+            width: 60%;
+            height: 50vh;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <form action="" method="post">
+        {% csrf_token %}
+
+        <br>
+        <br>
+        {% for field in form %}
+                <div class="container">
+                    <p> {{ field.errors }}</p>
+                    <br>
+                    <p>{{ field.label_tag }}</p>
+                    <p>{{ field }}</p>
+                    {% if field.help_text %}
+                        <p class="help">{{ field.help_text|safe }}</p>
+                    {% endif %}
+                </div>
+        {% endfor %}
+
+        <div class="d-flex justify-content-center">
+            <input type="submit" value="Submit">
+        </div>
+        <br><br><br><br><br>
+        <br>
+
+
+    </form>
+{% endblock %}
