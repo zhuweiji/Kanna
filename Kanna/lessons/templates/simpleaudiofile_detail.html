@@ -7,10 +7,12 @@
     <style>
         body{
             background-image: url("{% static "image2.png" %}");
+            background-attachment: fixed;
             background-size: cover;
             height: 130vh;
             color: #333333;
         }
+
         .centered{
             margin: 0 auto;
         }
@@ -41,8 +43,10 @@
         }
 
         .script-selector{
-            color: darkblue;
+            color: dodgerblue;
             text-decoration: underline;
+            font-size: 1.5em;
+
         }
         hr{
             border-top: 1px solid whitesmoke;
@@ -126,10 +130,15 @@
 
         <div id="all-scripts-box">
             <h3>Select a script to compare against:</h3>
+
             {% for script in scripts %}
-                <a href="" id="{{ script.id }}" class="script-selector">{{ script.topic }}</a>
+                <a href="" id="{{ script.id }}" class="script-selector"> > {{ script.topic }}</a>
                 <br>
             {% endfor %}
+            <br>
+            <br>
+            <br>
+            <p class="alert alert-danger"> Refresh the page after selecting topic to view report</p>
             {% if not scripts %}
                 <p> There are no scripts available </p>
             {% endif %}
@@ -200,7 +209,9 @@
                             method: 'save',
                             text: document.getElementById('text-editor').value
                         }
-                    }).success(location.reload())
+                    }).success(() => {
+                        location.reload();
+                    })
                 })
             })
 
@@ -227,8 +238,12 @@
                             method: 'analyse',
                             script: this.id
                         },
-                        success: (function(data){
-                            location.reload();
+                        success: ((event) => {
+                            let timeoutID = setTimeout(() => {
+                                alert("Refresh page to view report");
+                                location.reload();
+                            }, 3000);
+
                         })
                     })
                 })
