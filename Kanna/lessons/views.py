@@ -18,17 +18,38 @@ import io
 from .forms import *
 from .report import ReportAnalyser
 
-
-
 @login_required
 def index(request):
     user = None
     if request.user.is_authenticated:
         user = request.user
+
+    if request.user.is_superuser:
+        pass
+    else:
+        pass
+
     context = {
         'user': user
     }
     return render(request, 'index.html', context=context)
+
+
+class TopicCreateView(LoginRequiredMixin, generic.CreateView):
+    model = Topic
+    form_class = TopicCreateForm
+    template_name = "topic_create.html"
+
+    def get_success_url(self):
+        return reverse('script_create')
+
+
+class CreateScriptView(LoginRequiredMixin, CreateView):
+    template_name = 'script_create.html'
+    form_class = ScriptCreateForm
+
+    def get_success_url(self):
+        return reverse('mark_keywords', kwargs={'pk': self.object.pk})
 
 
 class ScriptListView(LoginRequiredMixin, generic.ListView):
@@ -66,11 +87,6 @@ class TranscriptDetailView(LoginRequiredMixin, DetailView):
 
     def add_transcript_to_session(self):
         pass
-
-
-class CreateScriptView(LoginRequiredMixin, CreateView):
-    template_name = 'script_create.html'
-    form_class = ScriptCreateForm
 
 
 class RecordView(LoginRequiredMixin, View):

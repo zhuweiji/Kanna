@@ -26,6 +26,12 @@ class AnalysisCreateForm(forms.ModelForm):
     #     return inst
 
 
+class TopicCreateForm(forms.ModelForm):
+    class Meta:
+        model = Topic
+        fields = "__all__"
+
+
 class ScriptCreateForm(forms.ModelForm):
     class Meta:
         model = Script
