@@ -1,6 +1,7 @@
 from difflib import SequenceMatcher
 from num2words import num2words
 import re
+import spacy
 
 from typing import List
 
@@ -19,6 +20,7 @@ from typing import List
 class ReportAnalyser:
     def __init__(self, script_text: str, script_flags: list, audioobj_text: str):
         print('runnning analysis')
+
         self.script = self.get_cleaned_text(script_text)
         self.transcript = self.get_cleaned_text(audioobj_text)
         self.script_flags = script_flags
@@ -56,12 +58,21 @@ class ReportAnalyser:
 
     def evaluate_similarity_index(self):
         """ placeholder similarity comparison"""
-        raw_output = SequenceMatcher(None, self.script, self.transcript).ratio()
+        transcript = self.transcript.split()
+        script = self.script.split()
 
-        output = round(raw_output * 10 / 8 * 100, 3)  # result can be considered good match at 80%
-        output = 100 if output > 100 else output
+        seqmatch_output = SequenceMatcher(None, self.script, self.transcript).ratio()
+        seqmatch_final = round(seqmatch_output * 10 / 8, 3)  # result can be considered good match at 80%
+        seqmatch_final = 1 if seqmatch_final > 1 else seqmatch_final
+
+        list1 = set(transcript)
+        list2 = set(script)
+        word_similiarity_output = sum(el in list1 for el in list2)/min(len(list1), len(list2))
+
+        output = seqmatch_final * 0.6 + word_similiarity_output * 0.4
 
         self.output['similarity'] = str(output) + "%"
+        return output
 
     def evaluate_keywords_hit(self) -> (int, int):
         # evaluate if all keywords are in transcript

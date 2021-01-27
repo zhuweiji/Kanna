@@ -14,6 +14,7 @@ from difflib import SequenceMatcher
 import os
 import functools
 import io
+import spacy
 from django.contrib.auth import login
 
 from .forms import *
@@ -208,8 +209,7 @@ class AudioUploadSuccessView(LoginRequiredMixin, View):
 
                 request.session['report'] = True  # store variable indicating report has been generated
 
-                # todo implement view to see changes
-
+                # todo implement view with short loading page that shows button after delay to see report
                 return render(request, 'simpleaudiofile_detail.html', context=context)
 
         else:
