@@ -2,6 +2,8 @@ from difflib import SequenceMatcher
 from num2words import num2words
 import re
 import spacy
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 from typing import List
 
@@ -29,13 +31,15 @@ class ReportAnalyser:
 
         self._output = {}
 
-        self.evaluate_similarity_index()
+        # self.evaluate_seqmatch_ratio()
         self.evaluate_keywords_hit()
         self.full_keyphrase_analysis()
+        self.evaluate_tfidf_similarity()
+        self.evaluate_words_hit()
 
-        print("script: ", self.script)
-        print("transcript: ", self.transcript)
-        print("highlights: ", self.highlighted_words)
+        # print("script: ", self.script)
+        # print("transcript: ", self.transcript)
+        # print("highlights: ", self.highlighted_words)
 
     def get_highlights(self) -> list:
         """ converts script flags to list of highlighted key phrases """
@@ -56,23 +60,37 @@ class ReportAnalyser:
                     phrase = ""
         return highlights
 
-    def evaluate_similarity_index(self):
-        """ placeholder similarity comparison"""
+    def evaluate_seqmatch_ratio(self):
+        """ overall bad comparator """
+        seqmatch_ratio = SequenceMatcher(None, self.script, self.transcript).ratio()
+        print(f"Sequence Matcher ratio: {seqmatch_ratio}")
+        seqmatch_final = round(seqmatch_ratio * 10 / 8, 3)  # result can be considered good match at 80%
+        seqmatch_final = 1 if seqmatch_final > 1 else seqmatch_final
+
+        self.output['seqmatch_ratio'] = str(seqmatch_final*100) + "%"
+        return seqmatch_final
+
+    def evaluate_tfidf_similarity(self):
+        vectorizer = TfidfVectorizer()
+
+        # To make uniformed vectors, both documents need to be combined first.
+
+        embeddings = vectorizer.fit_transform((self.transcript, self.script))
+
+        cosine_similarities = cosine_similarity(embeddings[0:1], embeddings[1:]).flatten()[0] * 100
+        # print(f"cosine similarity: {cosine_similarities}")
+        self.output['cosine_similarity'] = cosine_similarities
+        return cosine_similarities
+
+    def evaluate_words_hit(self):
         transcript = self.transcript.split()
         script = self.script.split()
 
-        seqmatch_output = SequenceMatcher(None, self.script, self.transcript).ratio()
-        seqmatch_final = round(seqmatch_output * 10 / 8, 3)  # result can be considered good match at 80%
-        seqmatch_final = 1 if seqmatch_final > 1 else seqmatch_final
-
         list1 = set(transcript)
         list2 = set(script)
-        word_similiarity_output = sum(el in list1 for el in list2)/min(len(list1), len(list2))
+        word_similiarity_output = (sum(el in list1 for el in list2) / min(len(list1), len(list2))) * 100
 
-        output = seqmatch_final * 0.6 + word_similiarity_output * 0.4
-
-        self.output['similarity'] = str(output) + "%"
-        return output
+        self.output['word_similarity'] = word_similiarity_output
 
     def evaluate_keywords_hit(self) -> (int, int):
         # evaluate if all keywords are in transcript
@@ -96,6 +114,9 @@ class ReportAnalyser:
     def analyse_keyphrase(self, keyphrase: str) -> dict:
         """ naively find LCS of highlight within transcript """
         # todo: lcs is bugged
+
+        # alternative is - although warning might not find lcs
+        # SequenceMatcher(None, str1, str2).find_longest_match(0, len(str1), 0, len(str2))
         transcript = self.transcript
 
         len_longest_subsequence = 0  # subsequence: any keyword at current position in transcript or any position after
@@ -157,6 +178,8 @@ class ReportAnalyser:
         self.output['keyphrase_score'] = overall_score
         return overall_score
 
+
+
     @property
     def output(self) -> {str: any}:
         return self._output
@@ -172,7 +195,6 @@ class ReportAnalyser:
         for word in result:
             if word.isnumeric():
                 word = num2words(word)
-                print(word)
             output += word
 
         output = output.lower()

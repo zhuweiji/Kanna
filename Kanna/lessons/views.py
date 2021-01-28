@@ -72,6 +72,7 @@ class CreateScriptView(LoginRequiredMixin, CreateView):
 class ScriptListView(LoginRequiredMixin, generic.ListView):
     model = Script
     template_name = 'script_list.html'
+    ordering = ['-id']
 
     # paginate_by = 10
 

@@ -69,15 +69,66 @@
                 <hr>
 
                 <br>
-                <h5><i>Keywords</i></h5>
-                <p>Keyphrase score: {{ keyphrase_score }} / 2</p>
-                <br>
+
 
                 <h5><i>Overall heuristics</i></h5>
-                <p>Similarity index: {{ similarity }}</p>
-                <p>Keywords missed: {{ keywords_missed }}</p>
+                <p>Similarity index:
+                    {% if cosine_similarity > 80 %}
+                        <span style="color: seagreen">{{ cosine_similarity }} %</span>
+                        <br>
+                        <small style="color: seagreen">Your transcript is excellent! It comes very close to the original
+                        and maintains most of the structure and flow. Excellent work!</small>
+                    {% elif cosine_similarity > 70 %}
+                        <span style="color: lightgreen">{{ cosine_similarity }} %</span>
+                        <br>
+                        <small style="color: lightgreen">Your transcript is great, but can definitely still be polished to
+                        hit closer to the original flow of the lesson. Great work.</small>
+                    {% elif cosine_similarity > 60 %}
+                        <span style="color: cadetblue">{{ cosine_similarity }} %</span>
+                        <br>
+                        <small style="color: cadetblue"> Your transcript is good, but can benefit from more careful structuring
+                        to come closer to the original flow that was intended. Good work. </small>
+                    {% elif cosine_similarity > 50 %}
+                        <span style="color: palevioletred">{{ cosine_similarity }} %</span>
+                        <br>
+                        <small style="color: palevioletred">Your transcript can definitely benefit from more work. Try to capture
+                        the original flow and structure of the lesson.</small>
+                    {% elif cosine_similarity > 45 %}
+                        <span style="color: orangered">{{ cosine_similarity }} %</span>
+                        <br>
+                        <small style="color: orangered"> Your transcript is straying from the original. While the overall flow of your
+                        lesson comes close to the original sometimes, it definitely still needs more work. Try
+                        to recall and articulate some of the main points covered in the original recording.</small>
+                    {% else %}
+                        <span style="color: red">{{ cosine_similarity }} %</span>
+                        <br>
+                        <small style="color: palevioletred">Your transcript is quite far off from the prepared lesson plan.
+                            Please listen to the original recording and try again. </small>
+                    {% endif %}
+                </p>
+
+                <p>Words hit: {{ word_similarity }} %
+                    <br>
+                    <small style="color: grey"> The similiarity in the words you have chosen compared to the original lesson plan</small>
+                </p>
+
+                <br>
+
+                <p>Keywords missed:
+                    {% if keywords_missed %}
+                        {{ keywords_missed }}
+                    {% else %}
+                        None!
+                    {% endif %}
+                </p>
                 <p>Ratio of keywords hit: {{ keywords_hit_ratio }}</p>
 
+                <br>
+
+                <h5><i>Keywords</i></h5>
+                <p>Keyphrase score: {{ keyphrase_score }} / 2</p>
+            <small style="color: grey"> keyphrase scoring is still bugged for the moment. </small>
+                <br>
 
             </div>
         </div>
